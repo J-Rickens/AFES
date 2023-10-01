@@ -42,6 +42,28 @@ def display(setType):
 
 	return 1
 
+def returnSet(setType):
+	fileNames = returnInfo(1)
+	fileName = ""
+	try:
+		fileName = fileNames[setType]
+	except:
+		print("Error with selected setType: " + str(setType))
+		return "error"
+
+	pyloc = os.getcwd()
+	fileloc = pyloc + "\\settings\\" + fileName
+
+	settings = {}
+	try:
+		with open(fileloc, 'r') as file_object:
+			settings = json.load(file_object)
+	except:
+		print("Error opening file: " + fileName)
+		return "error"
+
+	return settings
+
 def edit():
 	return 1
 
