@@ -21,14 +21,14 @@ def returnInfo(choice):
 	return info[choice]
 
 # Used by encrypt and decrypt to convert the mainKey (large postive int) to what is needed for cypher
-
-def setKey(mainkey, check):
+def setKey(mainkey, needSeed, check):
 	genSet = sm.returnSet(0)
 	charList = genSet["charList"]
 	if(check):
 		charList = charList.replace("\t","")
 		charList = charList.replace("\n","")
-	random.seed(mainkey)
+	if(needSeed):
+		random.seed(mainkey)
 
 	ckey = []
 	for i in range(len(charList),0,-1):
@@ -46,8 +46,8 @@ def setKey(mainkey, check):
 def encrypt(text, mainkey):
 	check = False
 	if (text.find("\t")==-1 and text.find("\n")==-1):
-		keyList = setKey(mainkey, True)
-	keyList = setKey(mainkey, check)
+		check = True
+	keyList = setKey(mainkey, True, check)
 	key = random.randInt(1-len(keyList),len(keyList)-1)
 	while (key == 0):
 		key = random.randInt(1-len(keyList),len(keyList)-1)
@@ -61,7 +61,7 @@ def encrypt(text, mainkey):
 	for char in text:
 		tempk = random.randInt(0,10)
 		if tempk == 0 or kl == tkl:
-			keyList = setKey(mainkey, check)
+			keyList = setKey(mainkey, False, check)
 			tkl = random.randInt(4,10)
 			kl = 0
 		if tempk%2 == 0 or k == tk:
@@ -87,8 +87,8 @@ def encrypt(text, mainkey):
 def decrypt(ctext, mainkey):
 	check = False
 	if (text.find("\t")==-1 and text.find("\n")==-1):
-		keyList = setKey(mainkey, True)
-	keyList = setKey(mainkey, check)
+		check = True
+	keyList = setKey(mainkey, True, check)
 	key = random.randInt(1-len(keyList),len(keyList)-1)
 	while (key == 0):
 		key = random.randInt(1-len(keyList),len(keyList)-1)
@@ -102,7 +102,7 @@ def decrypt(ctext, mainkey):
 	for char in text:
 		tempk = random.randInt(0,10)
 		if tempk == 0 or kl == tkl:
-			keyList = setKey(mainkey, check)
+			keyList = setKey(mainkey, False, check)
 			tkl = random.randInt(4,10)
 			kl = 0
 		if tempk%2 == 0 or k == tk:
