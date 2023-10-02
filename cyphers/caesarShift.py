@@ -37,7 +37,7 @@ def setKey(mainkey, needSeed, check):
 		if temp+1 == len(charList):
 			charList = charList[:temp]
 		else:
-			charList = charList[:temp] + charList[temp:]
+			charList = charList[:temp] + charList[temp+1:]
 
 	return ckey
 
