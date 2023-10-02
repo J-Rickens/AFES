@@ -47,7 +47,7 @@ def setKey(mainkey, needSeed, check):
 
 # encrypt is a public function to edit the text into cypher text
 # opo is the output orination as in what type of input/output rec is outputed
-def encrypt(text, mainkey, decrpting = False):
+def encrypt(text, mainkey, decrypting = False):
 	check = False
 	if (text.find("\t")==-1 and text.find("\n")==-1):
 		check = True
