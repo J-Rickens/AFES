@@ -43,7 +43,7 @@ def setKey(mainkey, needSeed, check):
 
 # encrypt is a public function to edit the text into cypher text
 # opo is the output orination as in what type of input/output rec is outputed
-def encrypt(text, mainkey):
+def encrypt(text, mainkey, decrypting = False):
 	check = False
 	if (text.find("\t")==-1 and text.find("\n")==-1):
 		check = True
@@ -71,7 +71,10 @@ def encrypt(text, mainkey):
 			tk = random.randInt(1,2)
 			k = 0
 
-		temp = keyList.find(char) + k + len(keyList)
+		if (decrypting):
+			temp = keyList.find(char) - k + len(keyList)
+		else:
+			temp = keyList.find(char) + k + len(keyList)
 		temp = temp % len(keyList)
 		ctext += keyList[temp]
 
@@ -85,41 +88,4 @@ def encrypt(text, mainkey):
 
 # decrypt is the inverse of encrypt and is a public function
 def decrypt(ctext, mainkey):
-	check = False
-	if (text.find("\t")==-1 and text.find("\n")==-1):
-		check = True
-	keyList = setKey(mainkey, True, check)
-	key = random.randInt(1-len(keyList),len(keyList)-1)
-	while (key == 0):
-		key = random.randInt(1-len(keyList),len(keyList)-1)
-
-	tkl = random.randInt(4,10)
-	kl = 0
-	tk = random.randInt(1,2)
-	k = 0
-
-	ctext = ""
-	for char in text:
-		tempk = random.randInt(0,10)
-		if tempk == 0 or kl == tkl:
-			keyList = setKey(mainkey, False, check)
-			tkl = random.randInt(4,10)
-			kl = 0
-		if tempk%2 == 0 or k == tk:
-			key = random.randInt(1-len(keyList),len(keyList)-1)
-			while (key == 0):
-				key = random.randInt(1-len(keyList),len(keyList)-1)
-			tk = random.randInt(1,2)
-			k = 0
-
-		temp = keyList.find(char) - k + len(keyList)
-		temp = temp % len(keyList)
-		ctext += keyList[temp]
-
-		kl += 1
-		k += 1
-
-	if check:
-		return ctext, 1
-	else:
-		return ctext, 0
+	return encrypt(ctext, mainkey, True)
