@@ -40,7 +40,7 @@ def setKey(mainkey, needSeed, check):
 		if temp+1 == len(charRem):
 			charRem = charRem[:temp]
 		else:
-			charRem = charRem[:temp] + charRem[temp:]
+			charRem = charRem[:temp] + charRem[temp+1:]
 
 	keyNum = random.randInt(2,12)
 	return keyNum, keyDict
