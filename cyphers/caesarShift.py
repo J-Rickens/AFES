@@ -32,7 +32,7 @@ def setKey(mainkey, needSeed, check):
 
 	ckey = []
 	for i in range(len(charList),0,-1):
-		temp = random.randInt(0,i-1)
+		temp = random.randint(0,i-1)
 		ckey.append(charList[temp])
 		if temp+1 == len(charList):
 			charList = charList[:temp]
@@ -48,27 +48,27 @@ def encrypt(text, mainkey, decrypting = False):
 	if (text.find("\t")==-1 and text.find("\n")==-1):
 		check = True
 	keyList = setKey(mainkey, True, check)
-	key = random.randInt(1-len(keyList),len(keyList)-1)
+	key = random.randint(1-len(keyList),len(keyList)-1)
 	while (key == 0):
-		key = random.randInt(1-len(keyList),len(keyList)-1)
+		key = random.randint(1-len(keyList),len(keyList)-1)
 
-	tkl = random.randInt(4,10)
+	tkl = random.randint(4,10)
 	kl = 0
-	tk = random.randInt(1,2)
+	tk = random.randint(1,2)
 	k = 0
 
 	ctext = ""
 	for char in text:
-		tempk = random.randInt(0,10)
+		tempk = random.randint(0,10)
 		if tempk == 0 or kl == tkl:
 			keyList = setKey(mainkey, False, check)
-			tkl = random.randInt(4,10)
+			tkl = random.randint(4,10)
 			kl = 0
 		if tempk%2 == 0 or k == tk:
-			key = random.randInt(1-len(keyList),len(keyList)-1)
+			key = random.randint(1-len(keyList),len(keyList)-1)
 			while (key == 0):
-				key = random.randInt(1-len(keyList),len(keyList)-1)
-			tk = random.randInt(1,2)
+				key = random.randint(1-len(keyList),len(keyList)-1)
+			tk = random.randint(1,2)
 			k = 0
 
 		if (decrypting):

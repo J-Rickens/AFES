@@ -33,16 +33,16 @@ def setKey(mainkey, needSeed, check):
 	keyDict = {}
 	charRem = charList
 	for i in range(len(charList),0,-1):
-		temp = random.randInt(0,i-1)
+		temp = random.randint(0,i-1)
 		while (charList[i-1] == charRem[temp]):
-			temp = random.randInt(0,i-1)
+			temp = random.randint(0,i-1)
 		keyDict[charList[i-1]] = charRem[temp]
 		if temp+1 == len(charRem):
 			charRem = charRem[:temp]
 		else:
 			charRem = charRem[:temp] + charRem[temp+1:]
 
-	keyNum = random.randInt(2,12)
+	keyNum = random.randint(2,12)
 	return keyNum, keyDict
 
 # encrypt is a public function to edit the text into cypher text
