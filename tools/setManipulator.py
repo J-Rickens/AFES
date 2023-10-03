@@ -1,3 +1,4 @@
+from UI import UI
 import os
 import json
 
@@ -10,7 +11,7 @@ def returnInfo(choice):
 
 	return info[choice]
 
-def display(setType):
+def returnSet(setType):
 	fileNames = returnInfo(1)
 	fileName = ""
 	try:
@@ -30,6 +31,11 @@ def display(setType):
 		print("Error opening file: " + fileName)
 		return "error"
 
+	return settings
+
+def display(setType):
+	settings = returnSet(setType)
+	
 	print("\nSetting\t\t\tValue")
 	print("----------------------------------------")
 	for key in settings:
@@ -46,6 +52,32 @@ def edit():
 	return 1
 
 def load():
+	pyloc = os.getwd()
+	settings = returnSet(1)
+	fileloc = settings["locCypherList"]
+	try:
+		os.chdir(fileloc)
+	except:
+		print("Error changing directory: " + fileloc)
+		return "error"
+
+	fileList = os.listdir()
+	cypherFiles = []
+	for file in fileList:
+		if (file == "cypherTP.py"):
+			continue
+		elif (file == "rsa.py"):
+			continue
+		elif (file[-3:] == ".py"):
+			cypherFiles.append(file)
+		else:
+			continue
+	
+	try:
+		os.chdir(pyloc)
+	except:
+		print("Error changing directory: " + fileloc)
+		return "error"
 	return 1
 
 def exportSet(epath):
