@@ -160,7 +160,63 @@ def load():
 		return 1
 
 def exportSet(epath):
+	typeNames = returnInfo(0)
+	allSettings = {}
+	for i,type in enumerate(typeNames):
+		temp = returnSet(i)
+		if (temp == "error"):
+			return "error"
+		else:
+			allSettings[type] = temp
+	
+	pyloc = os.getwd()
+	try:
+		os.chdir(epath)
+	except:
+		print("Error changing directory: " + epath)
+		return "error"
+
+	fileList = os.listdir()
+	fileName = "AFESsettings"
+	i = 1
+	while ((fileName+str(i)+".json") in fileList):
+		i += 1
+	fileName = fileName + str(i) + ".json"
+	
+	try:
+		with open(fileName, 'w') as file_object:
+			json.dump(allSettings, file_object)
+	except:
+		print("Error opening file: " + fileName)
+		return "error"
+	
+	try:
+		os.chdir(pyloc)
+	except:
+		print("Error changing directory: " + fileloc)
+		return "error"
 	return 1
 
 def importSet(ipathfile):
+	allSettings = {}
+	try:
+		with open(ipathfile, 'r') as file_object:
+			allSettings = json.load( file_object)
+	except:
+		print("Error opening file: " + ipathfile)
+		return "error"
+
+	typeNames = returnInfo(0)
+	for type, settings in allSettings.items():
+		try:
+			i = typeNames.index(type)
+			elif (edit(i, settings) == "error"):
+				print("Error saving setting type: " + type)
+				print("Continuing...")
+			elif (display(i) == "error"):
+				print("Error displaying setting type: " + type)
+				print("Continuing...")
+		except ValueError:
+			print("Error finding setting type: " + type)
+			print("Continuing...")
 	return 1
