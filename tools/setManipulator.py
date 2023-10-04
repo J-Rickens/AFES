@@ -1,6 +1,6 @@
-from UI import UI
 import os
 import json
+import random
 
 def returnInfo(choice):
 
@@ -33,6 +33,26 @@ def returnSet(setType):
 
 	return settings
 
+def edit(setType, settings):
+	fileNames = returnInfo(1)
+	fileName = ""
+	try:
+		fileName = fileNames[setType]
+	except:
+		print("Error with selected setType: " + str(setType))
+		return "error"
+
+	pyloc = os.getcwd()
+	fileloc = pyloc + "\\settings\\" + fileName
+
+	try:
+		with open(fileloc, 'w') as file_object:
+			json.dump(settings, file_object)
+	except:
+		print("Error opening file: " + fileName)
+		return "error"
+	return 1
+	
 def display(setType):
 	settings = returnSet(setType)
 	
@@ -48,12 +68,12 @@ def display(setType):
 
 	return 1
 
-def edit():
-	return 1
-
+# still needs work: error messages, test string based on inputrec, check outputrec, and check rsa.py
 def load():
 	pyloc = os.getwd()
 	settings = returnSet(1)
+	if (settings == "error"):
+		return "error"
 	fileloc = settings["locCypherList"]
 	try:
 		os.chdir(fileloc)
@@ -62,26 +82,85 @@ def load():
 		return "error"
 
 	fileList = os.listdir()
-	cypherFiles = []
+	cypherFilesG = []
+	cypherFilesI = []
+	cypherFilesE = []
 	for file in fileList:
 		if (file == "cypherTP.py"):
 			continue
 		elif (file == "rsa.py"):
+			# if correct do something
 			continue
 		elif (file[-3:] == ".py"):
-			cypherFiles.append(file)
+			working = True
+			try:
+				import file as testCypher
+
+				flag = True
+				if (type(testCypher.returnInfo(0)) != str):
+					print("error")
+				if (type(testCypher.returnInfo(1)) != str):
+					print("error")
+				if (type(testCypher.returnInfo(2)) != bool):
+					print("error")
+					working = False
+					flag = False
+				if (type(testCypher.returnInfo(3)) != float and type(testCypher.returnInfo(3)) != int):
+					print("error")
+					working = False
+					flag = False
+				inputRec = testCypher.returnInfo(4)
+				outputRec = testCypher.returnInfo(5)
+				i = 0
+				while (flag or i < len(inputRec)):
+					if (type(inputRec[i]) != float and type(inputRec[i]) != int):
+						print("error")
+						working = False
+						flag = False
+					elif (type(outputRec[i]) != float and type(outputRec[i]) != int):
+						print("error")
+						working = False
+						flag = False
+					else:
+						testText = "asdf"# wright something to pick random string based on inputRec
+						testKey = random.randint(999999,999999999999999)
+						testcText = testCypher.encrypt(testText, testKey)
+						# check if output matches output rec
+						testOutput = testCypher.decypt(testcText, testKey)
+						if (testText != testOutput or testText == testcText):
+							print("error")
+							working = False
+							flag = False
+					i += 1
+			except:
+				working = False
+			if (working):
+				if (file in settings[1]):
+					cypherFilesI.append(file)
+				else:
+					cypherFilesG.append(file)
+			else:
+				cypherFilesE.append(file)
 		else:
 			continue
-	
 	try:
 		os.chdir(pyloc)
 	except:
 		print("Error changing directory: " + fileloc)
 		return "error"
-	return 1
+
+	settings[0] = cypherFilesG
+	settings[1] = cypherFilesI
+	settings[2] = cypherFilesE
+	if (edit(1, settings) == "error"):
+		return "error"
+	elif (display(1) == "error"):
+		return "error"
+	else:
+		return 1
 
 def exportSet(epath):
 	return 1
 
-def importSet(ipath):
+def importSet(ipathfile):
 	return 1
