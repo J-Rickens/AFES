@@ -1,3 +1,4 @@
+from tools import recTool as rt
 import os
 import json
 import random
@@ -68,7 +69,6 @@ def display(setType):
 
 	return 1
 
-# still needs work: error messages, test string based on inputrec, check outputrec, and check rsa.py
 def load():
 	pyloc = os.getwd()
 	settings = returnSet(1)
@@ -122,10 +122,18 @@ def load():
 						working = False
 						flag = False
 					else:
-						testText = "asdf"# wright something to pick random string based on inputRec
+
+						testText = ""
+						testInRec = returnRec(inputRec[i])
+						for i in range(999999):
+							testText += testInRec[random.randint(0,len(testInRec)-1)]
 						testKey = random.randint(999999,999999999999999)
+
 						testcText = testCypher.encrypt(testText, testKey)
-						# check if output matches output rec
+						if (not rt.checkIfRec(testcText, outputRec[i])):
+							print("error")
+							working = False
+							flag = False
 						testOutput = testCypher.decypt(testcText, testKey)
 						if (testText != testOutput or testText == testcText):
 							print("error")
