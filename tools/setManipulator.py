@@ -190,16 +190,19 @@ def load():
 	else:
 		return 1
 
-# edit to specify what to include (auto exclude personal data like filepath)
-def exportSet(epath):
+def exportSet(epath, selected):
 	typeNames = returnInfo(0)
 	allSettings = {}
 	for i,type in enumerate(typeNames):
-		temp = returnSet(i)
-		if (temp == "error"):
-			return "error"
-		else:
-			allSettings[type] = temp
+		if (selected.has_key(type)):
+			temp = returnSet(i)
+			if (temp == "error"):
+				return "error"
+			else:
+				for k in temp.keys():
+					if (k not in selected[type]):
+						del temp[k]
+				allSettings[type] = temp
 	
 	pyloc = os.getwd()
 	try:
@@ -242,12 +245,19 @@ def importSet(ipathfile):
 	for type, settings in allSettings.items():
 		try:
 			i = typeNames.index(type)
-			elif (edit(i, settings) == "error"):
-				print("Error saving setting type: " + type)
+			temp = returnSet(i)
+			if (temp == "error"):
+				print("Error pulling current settings: " + type)
 				print("Continuing...")
-			elif (display(i) == "error"):
-				print("Error displaying setting type: " + type)
-				print("Continuing...")
+			else:
+				for key, value in settings.items():
+					temp[key] = value
+				if (edit(i, temp) == "error"):
+					print("Error saving setting type: " + type)
+					print("Continuing...")
+				elif (display(i) == "error"):
+					print("Error displaying setting type: " + type)
+					print("Continuing...")
 		except ValueError:
 			print("Error finding setting type: " + type)
 			print("Continuing...")
