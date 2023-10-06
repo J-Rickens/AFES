@@ -98,27 +98,33 @@ def load():
 
 				flag = True
 				if (type(testCypher.returnInfo(0)) != str):
-					print("error")
+					print("Error Name not str")
 				if (type(testCypher.returnInfo(1)) != str):
-					print("error")
-				if (type(testCypher.returnInfo(2)) != bool):
-					print("error")
+					print("Error Description not str")
+				testKSIndicator = testCypher.returnInfo(2)
+				if (type(testKSIndicator) != bool):
+					print("Error Keep Size indicator (KSI) not boolean")
 					working = False
 					flag = False
-				if (type(testCypher.returnInfo(3)) != float and type(testCypher.returnInfo(3)) != int):
-					print("error")
+				testMultiplyer = testCypher.returnInfo(3)
+				if (type(testMultiplyer) != float and type(testMultiplyer) != int):
+					print("Error Multiplyer not a Number")
 					working = False
 					flag = False
+				elif (testMultiplyer < 1):
+					print("Error unrealistic Multiplyer shoud be at least 1: " + testMultiplyer)
+				elif (testKSIndicator and testMultiplyer != 1):
+					print("Error Incorect Multiplyer for True KSI: " + testMultiplyer + " (should be 1)
 				inputRec = testCypher.returnInfo(4)
 				outputRec = testCypher.returnInfo(5)
 				i = 0
 				while (flag or i < len(inputRec)):
 					if (type(inputRec[i]) != float and type(inputRec[i]) != int):
-						print("error")
+						print("Error inputRec not a number")
 						working = False
 						flag = False
 					elif (type(outputRec[i]) != float and type(outputRec[i]) != int):
-						print("error")
+						print("Error outputRec not a number")
 						working = False
 						flag = False
 					else:
@@ -130,17 +136,34 @@ def load():
 						testKey = random.randint(999999,999999999999999)
 
 						testcText = testCypher.encrypt(testText, testKey)
+						if (testText == testcText):
+							print("Error ecrypt did not change text")
+							working = False
+							flag = False
 						if (not rt.checkIfRec(testcText, outputRec[i])):
-							print("error")
+							print("Error Incorrect outputRec")
 							working = False
 							flag = False
+						if (testKSIndicator and len(testText) != len(testcText)):
+							print("Error does not keep size when indicated")
+							working = False
+							flag = False
+						else:
+							multiplerDifferential = 1 - ((len(testText)*testMultiplyer)/len(testcText))
+							margin = .1
+							if ((not testKSIndicator) and abs(multiplyerDifferential) > margin):
+								print("Error Multiplyer is outside of margin of error")
+								working = False
+								flag = False
+						
 						testOutput = testCypher.decypt(testcText, testKey)
-						if (testText != testOutput or testText == testcText):
-							print("error")
+						if (testText != testOutput):
+							print("Error decrypt return to text")
 							working = False
-							flag = False
+							flag = False							
 					i += 1
 			except:
+				print("Error Functional Problem with cypher file")
 				working = False
 			if (working):
 				if (file in settings[1]):
@@ -167,6 +190,7 @@ def load():
 	else:
 		return 1
 
+# edit to specify what to include (auto exclude personal data like filepath)
 def exportSet(epath):
 	typeNames = returnInfo(0)
 	allSettings = {}
