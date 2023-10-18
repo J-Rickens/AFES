@@ -56,6 +56,8 @@ def edit(setType, settings):
 	
 def display(setType):
 	settings = returnSet(setType)
+	if settings == "error":
+		return "error"
 	
 	print("\nSetting\t\t\tValue")
 	print("----------------------------------------")
@@ -114,7 +116,7 @@ def load():
 				elif (testMultiplyer < 1):
 					print("Error unrealistic Multiplyer shoud be at least 1: " + testMultiplyer)
 				elif (testKSIndicator and testMultiplyer != 1):
-					print("Error Incorect Multiplyer for True KSI: " + testMultiplyer + " (should be 1)
+					print("Error Incorect Multiplyer for True KSI: " + testMultiplyer + " (should be 1)")
 				inputRec = testCypher.returnInfo(4)
 				outputRec = testCypher.returnInfo(5)
 				i = 0
@@ -131,7 +133,7 @@ def load():
 
 						testText = ""
 						testInRec = returnRec(inputRec[i])
-						for i in range(999999):
+						for i in range(9999):
 							testText += testInRec[random.randint(0,len(testInRec)-1)]
 						testKey = random.randint(999999,999999999999999)
 
@@ -194,17 +196,18 @@ def exportSet(epath, selected):
 	typeNames = returnInfo(0)
 	allSettings = {}
 	for i,type in enumerate(typeNames):
-		if (selected.has_key(type)):
+		if (type in selected):
 			temp = returnSet(i)
 			if (temp == "error"):
 				return "error"
 			else:
+				temp2 = temp.copy()
 				for k in temp.keys():
 					if (k not in selected[type]):
-						del temp[k]
-				allSettings[type] = temp
+						del temp2[k]
+				allSettings[type] = temp2
 	
-	pyloc = os.getwd()
+	pyloc = os.getcwd()
 	try:
 		os.chdir(epath)
 	except:
