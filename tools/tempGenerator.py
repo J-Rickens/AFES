@@ -20,24 +20,14 @@ def decrypt(ctext, mainkey):
 		return "error"
 	fileloc = settings["locCypherList"]
 
+	fileloc = fileloc + "\\tempCypher.py"
+	content = contents[0] + cypher + contents[1]
 	try:
-		os.chdir(fileloc)
-	except:
-		print("Error changing directory: " + fileloc)
-		return "error"
-
-	try:
-		content = contents[0] + cypher + contents[1]
-		with open("tempCypher.py", 'w') as file_object:
-			file_object.write(content)
+		file_object = open(fileloc, 'w')
+		file_object.write(content)
+		file_object.close()
 	except:
 		print("Error creating/changing tempCypher.py")
-		return "error"
-
-	try:
-		os.chdir(pyloc)
-	except:
-		print("Error changing directory: " + pyloc)
 		return "error"
 
 	return 1
