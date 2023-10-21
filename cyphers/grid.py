@@ -73,7 +73,7 @@ def setKey(mainkey, needSeed, decrypting):
 	xsize = random.randint(xmin,xmax)
 	ysize = (len(charList)//xsize) + 1
 
-	gird = {}
+	grid = {}
 	usedNum = []
 	for c in charList:
 		flag = True
@@ -121,7 +121,7 @@ def decrypt(ctext, mainkey):
 	resetCount = 0
 	resetNum = random.randint(5,15)
 	text = ""
-	for i in range(digits,len(ctext)+1,digits)
+	for i in range(digits,len(ctext)+1,digits):
 		num = ctext[i-digits:i]
 		text += key[num]
 

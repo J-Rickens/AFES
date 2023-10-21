@@ -72,9 +72,9 @@ def encrypt(text, mainkey, decrypting = False):
 			k = 0
 
 		if (decrypting):
-			temp = keyList.find(char) - k + len(keyList)
+			temp = keyList.index(char) - k + len(keyList)
 		else:
-			temp = keyList.find(char) + k + len(keyList)
+			temp = keyList.index(char) + k + len(keyList)
 		temp = temp % len(keyList)
 		ctext += keyList[temp]
 

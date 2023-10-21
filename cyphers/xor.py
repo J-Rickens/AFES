@@ -19,12 +19,11 @@ def returnInfo(choice):
 		'''description''',
 		False,
 		x,
-		[0,0],
-		[1,0]]
+		[0],
+		[1]]
 
 	return info[choice]
 
-# potential error if len(charList) = 2**x+1
 # Used by encrypt and decrypt to convert the mainKey (large postive int) to what is needed for cypher
 def setKey(mainkey):
 	genSet = sm.returnSet(0)
@@ -32,7 +31,15 @@ def setKey(mainkey):
 	random.seed(mainkey)
 
 	digits = len(bin(len(charList)-1)[2:])
-	splitvalue = 2**(digits-1)
+	splitvalue = 0
+	splitSize = 0
+	binLength = bin(len(charList)-1)[3:]
+	if (binLength[-1] == "1" and binLength.replace('0','') == "1"):
+		splitvalue = 2**(digits-2)
+		splitSize = 2
+	else:
+		splitvalue = 2**(digits-1)
+		splitSize = 1
 	maxvalue = (2**digits)-1
 	ckey = {}
 	ckeyInv = {}
@@ -40,33 +47,33 @@ def setKey(mainkey):
 
 	num = random.randint(splitvalue,maxvalue)
 	usedNum.append(num)
-	num = bin(num)[2:]
-	ckey["\t"] = num
-	ckeyInv[num] = "\t"
+	bnum = bin(num)[2:]
+	ckey["\t"] = bnum
+	ckeyInv[bnum] = "\t"
 	
 	while (num in usedNum):
 		num = random.randint(splitvalue,maxvalue)
 	usedNum.append(num)
-	num = bin(num)[2:]
-	ckey["\n"] = num
-	ckeyInv[num] = "\n"
+	bnum = bin(num)[2:]
+	ckey["\n"] = bnum
+	ckeyInv[bnum] = "\n"
 	
 	modCharList = charList.replace("\t","").replace("\n","")
 	for i,c in enumerate(modCharList):
 		while (num in usedNum):
-			if (i<=(splitvalue+2)):
+			if (i<(splitvalue)):
 				num = random.randint(0,(splitvalue-1))
 			else:
 				num = random.randint(splitvalue,maxvalue)
 		usedNum.append(num)
-		num = bin(num)[2:]
-		while (len(num) < digits):
-			num = "0" + num
-		ckey[c] = num
-		ckeyInv[num] = c
+		bnum = bin(num)[2:]
+		while (len(bnum) < digits):
+			bnum = "0" + bnum
+		ckey[c] = bnum
+		ckeyInv[bnum] = c
 
 	key = random.randint((2**15),(2**60))
-	return key, ckey, ckeyInv, 1
+	return key, ckey, ckeyInv, splitSize
 
 def xor(val,key):
 	key = bin(key)[3:]
@@ -88,7 +95,7 @@ def xor(val,key):
 # encrypt is a public function to edit the text into cypher text
 # opo is the output orination as in what type of input/output rec is outputed
 def encrypt(text, mainkey):
-	key, ckey, ckeyInv, opo = setKey(mainkey)
+	key, ckey, ckeyInv, splitSize = setKey(mainkey)
 
 	tempText = ""
 	for c in text:
@@ -96,33 +103,40 @@ def encrypt(text, mainkey):
 
 	tempText = xor(tempText,key)
 
-	digits = len(list(ckeyInv.keys())[0])-1
+	digits = len(list(ckeyInv.keys())[0])-splitSize
 	fillers = digits - len(tempText)%(digits)
 	for i in range(fillers):#
-		tempText = str(random.randint(0,1)) + tempText#
+		tempText = str(random.randint(0,1)) + tempText
 
 	ctext = ""
-	for i in range(digits,len(tempText)+1,digits)
-		ctext += ckeyInv[("0"+tempText[i-digits:i])]
+	if (splitSize == 1):
+		for i in range(digits,len(tempText)+1,digits):
+			ctext += ckeyInv[("0" + tempText[i-digits:i])]
+	elif (splitSize == 2):
+		for i in range(digits,len(tempText)+1,digits):
+			ctext += ckeyInv[("00" + tempText[i-digits:i])]
+	else:
+		print("Error splitSize")
+		return "error", "error"
 
-	return ctext, opo
+	return ctext, 1
 
 # decrypt is the inverse of encrypt and is a public function
 def decrypt(ctext, mainkey):
-	key, ckey, ckeyInv, _ = setKey(mainkey)
+	key, ckey, ckeyInv, splitSize = setKey(mainkey)
 
 	tempText = ""
 	for c in ctext:
-		tempText += ckey[c]
+		tempText += ckey[c][splitSize:]
 
 	digits = len(list(ckeyInv.keys())[0])
-	fillers = (digits-1) - len(tempText)%(digits-1)
+	fillers = len(tempText)%(digits)
 	tempText = tempText[fillers:]#
 
 	tempText = xor(tempText,key)
 
 	text = ""
-	for i in range(digits,len(tempText)+1,digits)
+	for i in range(digits,len(tempText)+1,digits):
 		text += ckeyInv[(tempText[i-digits:i])]#
 	
 	return text, 0

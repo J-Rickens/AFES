@@ -33,14 +33,20 @@ def setKey(mainkey, needSeed, check):
 	keyDict = {}
 	charRem = charList
 	for i in range(len(charList),0,-1):
-		temp = random.randint(0,i-1)
-		while (charList[i-1] == charRem[temp]):
-			temp = random.randint(0,i-1)
-		keyDict[charList[i-1]] = charRem[temp]
-		if temp+1 == len(charRem):
-			charRem = charRem[:temp]
+		if (i == 1 and charRem == charList[0]):
+			tempk = list(keyDict.keys())[random.randint(0,(len(keyDict)-1))]
+			tempc = keyDict[tempk]
+			keyDict[tempk] = charList[0]
+			keyDict[charList[0]] = tempc
 		else:
-			charRem = charRem[:temp] + charRem[temp+1:]
+			temp = random.randint(0,i-1)
+			while (charList[i-1] == charRem[temp]):
+				temp = random.randint(0,i-1)
+			keyDict[charList[i-1]] = charRem[temp]
+			if temp+1 == len(charRem):
+				charRem = charRem[:temp]
+			else:
+				charRem = charRem[:temp] + charRem[temp+1:]
 
 	keyNum = random.randint(2,12)
 	return keyNum, keyDict
@@ -78,4 +84,4 @@ def encrypt(text, mainkey, decrypting = False):
 
 # decrypt is the inverse of encrypt and is a public function
 def decrypt(ctext, mainkey):
-	return encrypt(text, mainkey, True)
+	return encrypt(ctext, mainkey, True)

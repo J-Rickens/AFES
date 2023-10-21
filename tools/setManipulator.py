@@ -167,7 +167,7 @@ def load():
 								working = False
 								flag = False
 							else:
-								multiplerDifferential = 1 - ((len(testText)*testMultiplyer)/len(testcText))
+								multiplyerDifferential = 1 - ((len(testText)*testMultiplyer)/len(testcText))
 								margin = .1
 								if ((not testKSIndicator) and abs(multiplyerDifferential) > margin):
 									print("Error Multiplyer is outside of margin of error")
