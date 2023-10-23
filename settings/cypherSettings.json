@@ -1,1 +1,1 @@
-{"cypherList":[],"inactiveList":[],"errorList":[],"locCypherList":".\\cyphers"}
+{"cypherList": ["bazeries", "caesarShift", "grid", "xor"], "inactiveList": [], "errorList": [], "locCypherList": ".\\cyphers"}
