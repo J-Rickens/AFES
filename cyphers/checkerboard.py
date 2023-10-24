@@ -1,6 +1,7 @@
 # Checkerboard Cypher
 from tools import setManipulator as sm
 import random
+import math
 
 # returnInfo is used to display info about the cypher but also has functional use
 # functional info: keepSize - does the ctext length always equals the text length (default False)
@@ -31,38 +32,38 @@ def setKey(mainkey, needSeed, decrypting):
 	cols = []
 	rows = []
 
-	maxlen = int(sqrt(len(charList))) + 1
+	maxlen = int(math.sqrt(len(charList))) + 1
 	rowlen = random.randint(4,maxlen)
 	columnlen = len(charList)//rowlen + 1
 
 	loc = [random.randint(0,rowlen), random.randint(0,columnlen)]
 	usedLoc = []
 	for c in charList:
-	while (loc in usedLoc):
-		loc = [random.randint(0,rowlen), random.randint(0,columnlen)]
-	usedLoc.append(loc)
-	if (decrypting):
-		grid[loc] = c
-	else:
-		grid[c] = loc
+		while (loc in usedLoc):
+			loc = [random.randint(0,rowlen), random.randint(0,columnlen)]
+		usedLoc.append(loc)
+		if (decrypting):
+			grid[str(loc[0]) + "," + str(loc[1])] = c
+		else:
+			grid[c] = loc
 
 	modCharList = charList.replace("\n","").replace("\t","")
 	totalLen = rowlen+columnlen+2
 	letPerNum = len(modCharList)//totalLen
 	for i in range(letPerNum):
 		for j in range(totalLen):
-			c = modCharList[random.randint(0,len(modCharList))]
-			modCharList.remove(c)#--------------------------------------------------------------
+			c = modCharList[random.randint(0,len(modCharList)-1)]
+			modCharList = modCharList.replace(c,"")
 			if (j <= rowlen):
-				if (I == 0):
+				if (i == 0):
 					rows.append([c])
 				else:
 					rows[j].append(c)
 			else:
-				if (I == 0):
+				if (i == 0):
 					cols.append([c])
 				else:
-					cols[j-rowlen].append(c)
+					cols[j-rowlen-1].append(c)
 
 	return grid, rows, cols
 
@@ -91,24 +92,28 @@ def encrypt(text, mainkey):
 # decrypt is the inverse of encrypt and is a public function
 def decrypt(ctext, mainkey):
 	grid, rows, cols = setKey(mainkey, True, True)
+	letPerNum = len(rows[0])
 
 	text = ""
 	i = 0
 	for j in range(0,len(ctext),2):
-		temp = []
+		temp = ""
 		for r, row in enumerate(rows):
 			if (ctext[j] in row):
-				temp.append(r)
+				temp = str(r)+","
 				break
 		for c, col in enumerate(cols):
 			if (ctext[j+1] in col):
-				temp.append(c)
+				temp += str(c)
 				break
 		text += grid[temp]
 
 		i += 1
+		trash = random.randint(0, letPerNum-1)
+		trash = random.randint(0, letPerNum-1)
 		if (i > random.randint(8,20)):
 			grid, rows, cols = setKey(mainkey, False, True)
+			letPerNum = len(rows[0])
 			i = 0
 
 	return text, 0

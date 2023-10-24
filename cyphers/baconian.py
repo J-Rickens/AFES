@@ -16,7 +16,7 @@ def returnInfo(choice):
 
 	infoLables = ["name", "description", "keepSize", "sizeAdj", "inputRec", "outputRec"]
 	
-	info = ["name",
+	info = ["baconian",
 		'''description''',
 		False,
 		1,
