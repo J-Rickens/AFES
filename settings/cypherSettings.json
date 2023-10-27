@@ -1,1 +1,1 @@
-{"cypherList": ["baconian", "bazeries", "caesarShift", "checkerboard", "grid", "xor"], "inactiveList": [], "errorList": ["bifid", "digrafid"], "locCypherList": ".\\cyphers"}
+{"cypherList": ["baconian", "bazeries", "bifid", "caesarShift", "checkerboard", "grid", "xor"], "inactiveList": [], "errorList": ["digrafid"], "locCypherList": ".\\cyphers"}
