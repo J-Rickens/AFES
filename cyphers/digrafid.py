@@ -235,5 +235,80 @@ def encrypt(text, mainkey):
 # decrypt is the inverse of encrypt and is a public function
 def decrypt(ctext, mainkey):
 	keyTables, size, _ = setKey(mainkey, True)
-	text = ctext
+	
+	textLen = len(ctext)//2
+	textEnd = ""
+	if (textLen%2 == 1):
+		textEnd = ctext[-3]
+		text = ctext[:-3]
+
+	size -= 1
+	totalIndex = 0
+	ctextIndext = 0
+	tempTable = [[],[],[]]
+	while (totalIndex < textLen):
+		interval = random.randint(3,8)
+		if (totalIndex+interval < textLen):
+			for i in range(0, interval*3, 3):
+				r1 = i//interval
+				r2 = (i+1)//interval
+				r3 = (i+2)//interval
+				c1 = ctext[ctextIndext]
+				c2 = ctext[ctextIndext+1]
+				c3 = ctext[ctextIndext+2]
+				c4 = ctext[ctextIndext+3]
+				temp = []
+				for j, row in enumerate(keyTables[1][0]):
+					if (c1 in row):
+						temp.append(row.index(c1))
+						temp.append(j*size)
+						break
+				for j, row in enumerate(keyTables[1][1]):
+					if (c2 in row):
+						temp[1] += j
+						temp.append(row.index(c2))
+						break
+				for j, row in enumerate(keyTables[2][0]):
+					if (c3 in row):
+						temp[0] += row.index(c1)
+						temp[1] += j*size
+						break
+				for j, row in enumerate(keyTables[2][1]):
+					if (c4 in row):
+						temp[1] += j
+						temp[2] += row.index(c2)
+						break
+				
+				tempTable[r1].append(temp[0])
+				tempTable[r2].append(temp[0])
+				tempTable[r3].append(temp[0])
+						
+			
+		totalIndex += interval
+		
+	keyTables, size, _ = setKey(mainkey, True)
+	text = ""
+	tableLen = len(tempTable[0])
+	if (textEnd != ""):
+		tableLen -= 1
+
+	for i in range(tableLen):
+		tempTable[1][i] = [divmod(tempTable[1][i], size)]
+		text += keyTables[0][0][tempTable[1][i][0]][tempTable[0][i]]
+		text += keyTables[0][1][tempTable[1][i][1]][tempTable[2][i]]
+
+	if (len(textEnd) > 0):
+		tempTable[1][-1] = tempTable[1][-1]//size
+		text += keyTables[0][0][tempTable[1][-1]][tempTable[0][-1]]
+
 	return text, 0
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
