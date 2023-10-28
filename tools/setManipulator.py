@@ -149,7 +149,7 @@ def load():
 
 							testText = ""
 							testInRec = rt.returnRec(inputRec[i])
-							for _ in range(999):
+							for _ in range(9999):
 								testText += testInRec[random.randint(0,len(testInRec)-1)]
 							testKey = random.randint(999999,999999999999999)
 

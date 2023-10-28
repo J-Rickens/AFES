@@ -48,12 +48,12 @@ def setKey(mainkey, needSeed):
 			keyTables[temp] = c
 			charList = charList.replace(c,"")
 
-	return keyTables, sizes
+	return keyTables
 
 # encrypt is a public function to edit the text into cypher text
 # opo is the output orination as in what type of input/output rec is outputed
 def encrypt(text, mainkey):
-	keyTables, sizes = setKey(mainkey, True)
+	keyTables = setKey(mainkey, True)
 
 	tempTable = [[],[],[]]
 	i = 0
@@ -63,10 +63,10 @@ def encrypt(text, mainkey):
 
 		i += 1
 		if (i >= random.randint(8,30)):
-			keyTables, sizes = setKey(mainkey, False)
+			keyTables = setKey(mainkey, False)
 			i = 0
 
-	keyTables, sizes = setKey(mainkey, True)
+	keyTables = setKey(mainkey, True)
 	temp = []
 	ctext = ""
 	i = 0
@@ -80,7 +80,7 @@ def encrypt(text, mainkey):
 
 				i += 1
 				if (i >= random.randint(1,3)):
-					keyTables, sizes = setKey(mainkey, False)
+					keyTables = setKey(mainkey, False)
 					i = 0
 
 	if (len(temp) == 1):
@@ -91,7 +91,7 @@ def encrypt(text, mainkey):
 
 # decrypt is the inverse of encrypt and is a public function
 def decrypt(ctext, mainkey):
-	keyTables, sizes = setKey(mainkey, True)
+	keyTables = setKey(mainkey, True)
 
 	chars = (len(ctext)*2)//3
 	tempTable = [[],[],[]]
@@ -108,12 +108,12 @@ def decrypt(ctext, mainkey):
 
 		i += 1
 		if (i >= random.randint(1,3)):
-			keyTables, sizes = setKey(mainkey, False)
+			keyTables = setKey(mainkey, False)
 			i = 0
 
 	tempTable[2].extend(keyTables[ctext[-1]])
 
-	keyTables, sizes = setKey(mainkey, True)
+	keyTables = setKey(mainkey, True)
 	text = ""
 	i = 0
 	for j in range(len(tempTable[0])):
@@ -122,7 +122,7 @@ def decrypt(ctext, mainkey):
 
 		i += 1
 		if (i >= random.randint(8,30)):
-			keyTables, sizes = setKey(mainkey, False)
+			keyTables = setKey(mainkey, False)
 			i = 0
 
 	return text, 0

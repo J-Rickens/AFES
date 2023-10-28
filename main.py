@@ -4,7 +4,7 @@ from tools import recTool as rt
 import random
 
 
-print(tg.createTempCypher("bifid"))
+print(tg.createTempCypher("digrafid"))
 from cyphers import tempCypher as cs
 
 print(cs.returnInfo(0))
