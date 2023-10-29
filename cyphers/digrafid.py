@@ -108,6 +108,7 @@ def encrypt(text, mainkey):
 		text = text[:-1]
 
 	tempTable = [[],[],[]]
+	counter = 0
 	for i in range(0,len(text),2):
 		for j, row in enumerate(keyTables[0][0]):
 			if (text[i] in row):
@@ -119,6 +120,11 @@ def encrypt(text, mainkey):
 				tempTable[1][i//2] += j
 				tempTable[2].append(row.index(text[i+1])) 
 				break
+
+		counter += 1
+		if (counter >= random.randint(8,20)):
+			keyTables, _, _ = setKey(mainkey, False)
+			counter = 0
 
 	if (len(textEnd) > 0):
 		for j, row in enumerate(keyTables[0][0]):
@@ -241,6 +247,7 @@ def encrypt(text, mainkey):
 				ctext += keyTables[2][0][temp[2][0]][temp[2][1]]
 
 		totalIndex += interval
+		keyTables, _, _ = setKey(mainkey, False)
 
 	return ctext, returnInfo(5)[opoI]
 
@@ -398,17 +405,24 @@ def decrypt(ctext, mainkey):
 				tempTable[r2].append(temp[1])
 
 		totalIndex += interval
+		keyTables, _, _ = setKey(mainkey, False)
 		
 	keyTables, size, _ = setKey(mainkey, True)
 	text = ""
 	if (len(textEnd) > 0):
 		tableLen -= 1
 
+	counter = 0
 	for i in range(tableLen):
 		t1, t2 = divmod(tempTable[1][i], size)
 		tempTable[1][i] = [t1, t2]
 		text += keyTables[0][0][tempTable[1][i][0]][tempTable[0][i]]
 		text += keyTables[0][1][tempTable[1][i][1]][tempTable[2][i]]
+
+		counter += 1
+		if (counter >= random.randint(8,20)):
+			keyTables, _, _ = setKey(mainkey, False)
+			counter = 0
 
 	if (len(textEnd) > 0):
 		tempTable[1][-1] = tempTable[1][-1]//size
