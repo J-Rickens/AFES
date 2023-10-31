@@ -2,10 +2,22 @@ from tools import setManipulator as sm
 from tools import tempGenerator as tg
 from tools import recTool as rt
 import random
+import rsa
+
+epath = "./downloads/public_key.pem"
+file_object = open(epath, 'rb')
+publicKey = rsa.PublicKey.load_pkcs1(file_object.read())
+file_object.close()
+epath = "./downloads/private_key.pem"
+file_object = open(epath, 'rb')
+privateKey = rsa.PrivateKey.load_pkcs1(file_object.read())
+file_object.close()
+from cyphers import rsa as cs
 
 
-print(tg.createTempCypher("digrafid"))
-from cyphers import tempCypher as cs
+#print(tg.createTempCypher("bifid"))
+#from cyphers import tempCypher as cs
+
 
 print(cs.returnInfo(0))
 print(cs.returnInfo(1))
@@ -26,10 +38,12 @@ testKey = random.randint(999999,999999999999999)
 print("key: ",testKey,"\n")
 print("text: ",testText,"\n")
 
-testcText, a1 = cs.encrypt(testText, testKey)
+#testcText, a1 = cs.encrypt(testText, testKey)
+testcText, a1 = cs.encrypt(testText, testKey, publicKey)
 print("ctext: ",testcText,"\n")
 
-finaltext, a2 = cs.decrypt(testcText, testKey)
+#finaltext, a2 = cs.decrypt(testcText, testKey)
+finaltext, a2 = cs.decrypt(testcText, testKey, privateKey)
 print("ftext: ",finaltext,"\n")
 
 
