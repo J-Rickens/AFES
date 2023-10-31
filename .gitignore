@@ -1,5 +1,6 @@
 tools/__pycache__/
 cyphers/__pycache__/
 UI/__pycache__/
+downloads/
 
 cyphers/tempCypher.py

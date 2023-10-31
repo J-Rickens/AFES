@@ -1,5 +1,6 @@
 from tools import recTool as rt
 from tools import tempGenerator as tg
+from tools import keyGenerator as rkg
 import os
 import json
 import random
@@ -75,7 +76,7 @@ def display(setType):
 
 	return 1
 
-def load():
+def loadCyphers():
 	pyloc = os.getcwd()
 	settings = returnSet(1)
 	if (settings == "error"):
@@ -92,14 +93,57 @@ def load():
 	cypherFilesG = []
 	cypherFilesI = []
 	cypherFilesE = []
+	rsaFunctional = False
 	importflag = True
 	for file in fileList:
 		if (file == "cypherTP.py" or file == "tempCypher.py" or file == "__init__.py"):
 			continue
-		elif (file == "rsa.py"):
-			# if correct do something
-			continue
+		elif (file == "rsaCypher.py"):
+			print("\nNext:")
+			working = True
+			try:
+				from cyphers import rsaCypher
+				importlib.reload(rsaCypher)
+
+				RSAKeys = rkg.importKeys()
+				if (RSAKeys == "error"):
+					names = rkg.genKeys("key")
+					if (names == "error"):
+						print("falied to gnerate new keys.")
+						raise KeyGenError
+					print("Created new key pair:", names[0][7:-4])
+					RSAKeys = rkg.importKeys(names[0][7:-4])
+				else:
+					RSAKeys = [RSAKeys[0][0],RSAKeys[1][0]]
+				publicKey = RSAKeys[0]
+				privateKey = RSAKeys[1]
+
+				if (type(rsaCypher.returnInfo(0)) != str):
+					print("Error Name not str")
+				else:
+					print(rsaCypher.returnInfo(0))
+
+				testText = ""
+				testInRec = rt.returnRec(rsaCypher.returnInfo(4)[0])
+				for _ in range(9999):
+					testText += testInRec[random.randint(0,len(testInRec)-1)]
+				testKey = random.randint(999999,999999999999999)
+
+				testcText, _ = rsaCypher.encrypt(testText, testKey, publicKey)
+				if (testText == testcText):
+					print("Error ecrypt did not change text")
+					working = False
+				testOutput, _ = rsaCypher.decrypt(testcText, testKey, privateKey)
+				if (testText != testOutput):
+					print("Error decrypt return to text")
+					working = False
+			except:
+				print("Error Functional Problem with RSA cypher file")
+				working = False
+			if (working):
+				rsaFunctional = True
 		elif (file[-3:] == ".py"):
+			print("\nNext:")
 			working = True
 			try:
 				if (tg.createTempCypher(file[:-3]) == "error"):
@@ -109,8 +153,7 @@ def load():
 					if (importflag):
 						from cyphers import tempCypher as testCypher
 						importflag = False
-					else:
-						importlib.reload(testCypher)
+					importlib.reload(testCypher)
 
 					flag = True
 					if (type(testCypher.returnInfo(0)) != str):
@@ -196,6 +239,7 @@ def load():
 	settings["cypherList"] = cypherFilesG
 	settings["inactiveList"] = cypherFilesI
 	settings["errorList"] = cypherFilesE
+	settings["rsaFunctional"] = rsaFunctional
 	if (edit(1, settings) == "error"):
 		return "error"
 	elif (display(1) == "error"):
