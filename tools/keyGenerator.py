@@ -71,6 +71,7 @@ def genKeys(name):
 	return saveKeys(name, publicKey, privateKey)
 
 def importKeys(name = "", needPub = True, needPri = True):
+	pyloc = os.getcwd()
 	settings = sm.returnSet(3)
 	if (settings == "error"):
 		return settings

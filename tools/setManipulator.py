@@ -104,10 +104,8 @@ def loadCyphers():
 			try:
 				from cyphers import rsaCypher
 				importlib.reload(rsaCypher)
-				print(1)
 
 				RSAKeys = rkg.importKeys()
-				print(2)
 				if (RSAKeys == "error"):
 					names = rkg.genKeys("key")
 					if (names == "error"):
@@ -117,14 +115,13 @@ def loadCyphers():
 					RSAKeys = rkg.importKeys(names[0][7:-4])
 				else:
 					RSAKeys = [RSAKeys[0][0],RSAKeys[1][0]]
-				print(3)
 				publicKey = RSAKeys[0]
 				privateKey = RSAKeys[1]
 
-				if (type(testCypher.returnInfo(0)) != str):
+				if (type(rsaCypher.returnInfo(0)) != str):
 					print("Error Name not str")
 				else:
-					print(testCypher.returnInfo(0))
+					print(rsaCypher.returnInfo(0))
 
 				testText = ""
 				testInRec = rt.returnRec(rsaCypher.returnInfo(4)[0])
