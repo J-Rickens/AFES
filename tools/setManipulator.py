@@ -114,7 +114,10 @@ def loadCyphers():
 					print("Created new key pair:", names[0][7:-4])
 					RSAKeys = rkg.importKeys(names[0][7:-4])
 				else:
-					RSAKeys = [RSAKeys[0][0],RSAKeys[1][0]]
+					for key in RSAKeys[0].keys():
+						if (key in RSAKeys[1].keys()):
+							RSAKeys = [RSAKeys[0][key],RSAKeys[1][key]]
+							break
 				publicKey = RSAKeys[0]
 				privateKey = RSAKeys[1]
 

@@ -4,6 +4,7 @@ import os
 
 
 def saveKeys(name, publicKey, privateKey):
+	pyloc = os.getcwd()
 	settings = sm.returnSet(3)
 	if (settings == "error"):
 		return settings
@@ -88,12 +89,12 @@ def importKeys(name = "", needPub = True, needPri = True):
 				fileListPub = os.listdir(locPub)
 			except:
 				print("Error pulling directory: " + locPub)
-			publicKey = []
+			publicKey = {}
 			for fileName in fileListPub:
 				if (len(fileName) >= 12 and fileName[-4:] == ".pem" and fileName[:7] == "public_"):
 					try:
 						file_object = open((locPub+"\\"+fileName), 'rb')
-						publicKey.append(rsa.PublicKey.load_pkcs1(file_object.read()))
+						publicKey[fileName[7:-4]] = rsa.PublicKey.load_pkcs1(file_object.read())
 						file_object.close()
 					except:
 						print("Error opening key: " + fileName)
@@ -117,12 +118,12 @@ def importKeys(name = "", needPub = True, needPri = True):
 				fileListPri = os.listdir(locPri)
 			except:
 				print("Error pulling directory: " + locPri)
-			privateKey = []
+			privateKey = {}
 			for fileName in fileListPri:
 				if (len(fileName) >= 13 and fileName[-4:] == ".pem" and fileName[:8] == "private_"):
 					try:
 						file_object = open((locPri+"\\"+fileName), 'rb')
-						privateKey.append(rsa.PrivateKey.load_pkcs1(file_object.read()))
+						privateKey[fileName[8:-4]] = rsa.PrivateKey.load_pkcs1(file_object.read())
 						file_object.close()
 					except:
 						print("Error opening key: " + fileName)
