@@ -100,11 +100,11 @@ def importKeys(name = "", needPub = True, needPri = True):
 						print("Error opening key: " + fileName)
 		else:
 			try:
-				file_object = open((locPub+"\\public_"+fileNamePub+".pem"), 'rb')
+				file_object = open((locPub+"\\public_"+name+".pem"), 'rb')
 				publicKey = rsa.PublicKey.load_pkcs1(file_object.read())
 				file_object.close()
 			except:
-				print("Error opening key: " + (locPub+"\\public_"+fileNamePub+".pem"))
+				print("Error opening key: " + (locPub+"\\public_"+name+".pem"))
 
 	privateKey = ""
 	if (needPri):
@@ -129,13 +129,13 @@ def importKeys(name = "", needPub = True, needPri = True):
 						print("Error opening key: " + fileName)
 		else:
 			try:
-				file_object = open((locPri+"\\private_"+fileNamePri+".pem"), 'rb')
+				file_object = open((locPri+"\\private_"+name+".pem"), 'rb')
 				privateKey = rsa.PrivateKey.load_pkcs1(file_object.read())
 				file_object.close()
 			except:
-				print("Error opening key: " + (locPri+"\\private_"+fileNamePri+".pem"))
+				print("Error opening key: " + (locPri+"\\private_"+name+".pem"))
 
-	if (len(publicKey) == 0 and len(privateKey) == 0):
+	if ((publicKey == "" or publicKey == {}) and (privateKey == "" or privateKey == {})):
 		print("Error no keys found.")
 		return "error"
 	return publicKey, privateKey
