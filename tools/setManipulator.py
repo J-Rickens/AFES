@@ -94,7 +94,7 @@ def loadCyphers():
 	cypherFilesI = []
 	cypherFilesE = []
 	rsaFunctional = False
-	importflag = True
+	importFlag = True
 	for file in fileList:
 		if (file == "cypherTP.py" or file == "tempCypher.py" or file == "__init__.py"):
 			continue
@@ -153,9 +153,9 @@ def loadCyphers():
 					print("Error Functional Problem loading temp")
 					working = False
 				else:
-					if (importflag):
+					if (importFlag):
 						from cyphers import tempCypher as testCypher
-						importflag = False
+						importFlag = False
 					importlib.reload(testCypher)
 
 					flag = True

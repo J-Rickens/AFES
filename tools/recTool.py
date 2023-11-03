@@ -16,7 +16,10 @@ def returnRec(recIndex):
 		4: "0123456789",
 		4.1: "0123456789-"}
 
-	return recs[recIndex]
+	if (recIndex == "full"):
+		return recs
+	else:
+		return recs[recIndex]
 
 def checkIfRec(text, recIndex):
 	rec = returnRec(recIndex)
