@@ -7,7 +7,6 @@ import random
 import importlib
 import hashlib
 import json
-import rsa
 
 genkeySize = 16
 
@@ -15,11 +14,53 @@ def saveCtext(ctext, locSave = ""):
 	hashSettings = sm.returnSet(2)
 	if (hashSettings == "error"):
 		return hashSettings
+	storHash = hashlib.pbkdf2_hmac(hashSettings["typeSt"],ctext.encode(),hashSettings["saltSt"],10000).hex()
 
-	locSave = locSave.split("\\")
-	loc = "\\".join(locSave[:-1])
-	fileName = locSave[-1]
-	return 1
+	loc = ""
+	fileName = ""
+	if (locSave == ""):
+		pyloc = os.getcwd()
+		genSettings = sm.returnSet(0)
+		if (genSettings == "error"):
+			return genSettings
+		if (genSettings["locSaveCypherText"][0] == "."):
+			loc = pyloc + genSettings["locSaveCypherText"][1:]
+		else:
+			loc = genSettings["locSaveCypherText"]
+		fileName = "cypherText.json"
+		locSave = loc+"\\"+fileName
+	else:
+		locSave = locSave.split("\\")
+		loc = "\\".join(locSave[:-1])
+		fileName = locSave[-1]
+
+	data = {}
+	try:
+		if (fileName in os.listdir(loc)):
+			file_object = open(locSave, 'r')
+			data = json.load(file_object)
+			file_object.close()
+		else:
+			data = {"Storage_Hash":"Cypher_Text"}
+	except:
+		print("Error searching directory or loading current data file:", locSave)
+		return "error"
+
+	if (storHash in data):
+		i = 0
+		while ((storHash + "S" + i) in data):
+			i += 1
+		storHash += "S" + i
+	data[storHash] = ctext
+
+	try:
+		file_object = open(locSave, 'w')
+		json.dump(data, file_object)
+		file_object.close()
+	except:
+		print("Error saving data file:", locSave)
+		return "error"
+	return locSave, storHash
 
 def mainkeyGen(isPassword = False, RSAn = 0):
 	hashSettings = sm.returnSet(2)
@@ -44,7 +85,7 @@ def mainkeyGen(isPassword = False, RSAn = 0):
 	mainkey = (genkey + phash + RSAn)
 	return mainkey, genkey
 
-def encrypt(layers = 3, sizeMulti = 1, text = "", locText = "", locSave = "", isPassword = False, isRSA = False, mainkey = ""):
+def encrypt(layers = 3, sizeMulti = 1, text = "", locText = "", locSave = "", isPassword = False, isRSA = False, mainkey = "", genkey = 0):
 	if (sm.loadCyphers() == "error"):
 		print("Error running loadCyphers.")
 		return "error"
@@ -74,7 +115,7 @@ def encrypt(layers = 3, sizeMulti = 1, text = "", locText = "", locSave = "", is
 			text = file_object.read()
 			file_object.close()
 			if (len(text) == 0):
-				print("Error no text.")
+				print("Error no text in file.")
 				return "error"
 		except:
 			print("Error opening text:",locText)
@@ -85,7 +126,6 @@ def encrypt(layers = 3, sizeMulti = 1, text = "", locText = "", locSave = "", is
 		if (rt.checkIfRec(text, rec)):
 			currentOpo = rec
 	
-	genkey = 0
 	if (mainkey == ""):
 		temp = mainkeyGen(isPassword)
 		if (temp == "error"):
@@ -142,16 +182,64 @@ def encrypt(layers = 3, sizeMulti = 1, text = "", locText = "", locSave = "", is
 
 
 	if (not isRSA):
-		saveCtext(ctext, locSave)
-	return ctext
+		tempSaver = saveCtext(ctext, locSave)
+		if (tempSaver == "error"):
+			print("Error in saveCtext.")
+			return "error"
+		else:
+			return ctext, tempSaver[0], tempSaver[1]
+	else:
+		return ctext
 
-def encryptWithRSA(layers = 3, text = "", locText = "", locSave = "", isPassword = False, publicKeyName = ""):
+def encryptWithRSA(layers = 3, sizeMulti = 1, text = "", locText = "", locSave = "", isPassword = False, publicKeyName = ""):
+	if (text == "" and locText == ""):
+		print("Error no text.")
+		return "error"
+	elif (text == ""):
+		try:
+			file_object = open(locText, 'r')
+			text = file_object.read()
+			file_object.close()
+			if (len(text) == 0):
+				print("Error no text in file.")
+				return "error"
+		except:
+			print("Error opening text:",locText)
+			return "error"
+
 	if (publicKeyName == ""):
 		publicKey, privateKey = rkg.importKeys(name = publicKeyName)
 	else:
 		publicKey, _ = rkg.importKeys(name = publicKeyName, needPri = False)
 
-	mainkey = mainkeyGen(isPassword, True, publicKey.n)
-	ctext = encrypt(layers, text, locText, isRSA = True, mainkey = mainkey)
-	saveCtext(ctext, locSave)
-	return ctext
+	tempkeys = mainkeyGen(isPassword, publicKey.n)
+	if (tempkeys == "error"):
+		print("Error mainkeyGen")
+		return "error"
+	else:
+		genkey = tempkeys[1]
+		mainkey = tempkeys[0]
+
+
+	ctext = encrypt(layers = layers, sizeMulti = sizeMulti, text = text, isRSA = True, mainkey = mainkey, genkey = genkey)
+	if (ctext == "error"):
+		print("Error in regular encrypt.")
+		return "error"
+	else:
+		ctext = ctext[0]
+
+	try:
+		from cyphers import rsaCypher
+		importlib.reload(rsaCypher)
+		ctext = rsaCypher.encrypt(ctext, mainkey, publicKey)
+	except:
+		print("Error running rsa cypher.")
+		return "error"
+
+
+	tempSaver = saveCtext(ctext, locSave)
+	if (tempSaver == "error"):
+		print("Error in saveCtext.")
+		return "error"
+	else:
+		return ctext, tempSaver[0], tempSaver[1]

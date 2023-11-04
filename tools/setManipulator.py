@@ -77,7 +77,6 @@ def display(setType):
 	return 1
 
 def loadCyphers():
-	pyloc = os.getcwd()
 	settings = returnSet(1)
 	if (settings == "error"):
 		return "error"
