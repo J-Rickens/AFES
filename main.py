@@ -88,3 +88,12 @@ else:
 
 input('pause')
 print(sm.load())
+
+
+
+import codecs
+import os
+import hashlib
+hashlib.algorithms_available
+hashSettings['saltEn'] = codecs.encode(os.urandom(hashSettings['sizeEn']),'hex').decode()
+hashSettings['saltSt'] = codecs.encode(os.urandom(hashSettings['sizeSt']),'hex').decode()

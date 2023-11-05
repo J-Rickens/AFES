@@ -1,1 +1,1 @@
-{"typeEn":"md5","sizeEn":32,"saltEn":"hex","typeSt":"md5","sizeSt":16,"saltSt":"hex"}
+{"typeEn": "sha256", "sizeEn": 32, "saltEn": "05375c9482cbdc42ba0b5a18bd62f51e1dfae8f614d7560a9ab59d8dc4c215b1", "typeSt": "md5", "sizeSt": 16, "saltSt": "4634ffbb204012a1d267f5bd00dfa798"}

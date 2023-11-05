@@ -7,6 +7,7 @@ import random
 import importlib
 import hashlib
 import json
+import codecs
 
 genkeySize = 16
 
@@ -14,7 +15,7 @@ def saveCtext(ctext, locSave = ""):
 	hashSettings = sm.returnSet(2)
 	if (hashSettings == "error"):
 		return hashSettings
-	storHash = hashlib.pbkdf2_hmac(hashSettings["typeSt"],ctext.encode(),hashSettings["saltSt"],10000).hex()
+	storHash = hashlib.pbkdf2_hmac(hashSettings["typeSt"],ctext.encode(),codecs.decode(hashSettings["saltSt"], 'hex'),10000).hex()
 
 	loc = ""
 	fileName = ""
@@ -33,6 +34,7 @@ def saveCtext(ctext, locSave = ""):
 		locSave = locSave.split("\\")
 		loc = "\\".join(locSave[:-1])
 		fileName = locSave[-1]
+		locSave = loc+"\\"+fileName
 
 	data = {}
 	try:
@@ -48,9 +50,9 @@ def saveCtext(ctext, locSave = ""):
 
 	if (storHash in data):
 		i = 0
-		while ((storHash + "S" + i) in data):
+		while ((storHash + "S" + str(i)) in data):
 			i += 1
-		storHash += "S" + i
+		storHash += "S" + str(i)
 	data[storHash] = ctext
 
 	try:
@@ -62,27 +64,27 @@ def saveCtext(ctext, locSave = ""):
 		return "error"
 	return locSave, storHash
 
-def mainkeyGen(isPassword = False, RSAn = 0):
+def mainkeyGen(isPassword = False, RSAn = 1):
 	hashSettings = sm.returnSet(2)
 	if (hashSettings == "error"):
 		return hashSettings
 
 	random.seed()
-	genkey = random.randint(10**(genkeySize-1),(10**genkeySize)-1)
+	genkey = random.randint(10**(genkeySize-1),(10**genkeySize)-3)
 
-	phash = ""
-	if (isPassowrd):
+	phash = 1
+	if (isPassword):
 		hashFlag = True
 		while (hashFlag):
-			phash = int(hashlib.pbkdf2_hmac(hashSettings["typeEn"],input('Enter Password: ').encode(),hashSettings["saltEn"],10000).hex(), 16)
-			if (phash == int(hashlib.pbkdf2_hmac(hashSettings["typeEn"],input('Re-enter Password: ').encode(),hashSettings["saltEn"],10000).hex(), 16)):
+			phash = int(hashlib.pbkdf2_hmac(hashSettings["typeEn"],input('Enter Password: ').encode(),codecs.decode(hashSettings["saltEn"], 'hex'),10000).hex(), 16)
+			if (phash == int(hashlib.pbkdf2_hmac(hashSettings["typeEn"],input('Re-enter Password: ').encode(),codecs.decode(hashSettings["saltEn"], 'hex'),10000).hex(), 16)):
 				hashFlag = False
 			else:
 				print("Password did not match. Please try again.")
 		if (phash < 0):
 			phash *= -1
 
-	mainkey = (genkey + phash + RSAn)
+	mainkey = (genkey + phash + RSAn)%(10**(genkeySize*4))
 	return mainkey, genkey
 
 def encrypt(layers = 3, sizeMulti = 1, text = "", locText = "", locSave = "", isPassword = False, isRSA = False, mainkey = "", genkey = 0):
@@ -178,7 +180,7 @@ def encrypt(layers = 3, sizeMulti = 1, text = "", locText = "", locSave = "", is
 		ctext = ctext[:splitValue] + cypher.encrypt(genkey,len(ctext)+len(genkey)) + ctext[splitValue:]
 	except:
 		print("Error running Cypher. layer: genkey")
-			return "error"
+		return "error"
 
 
 	if (not isRSA):
