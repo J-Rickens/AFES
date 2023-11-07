@@ -99,7 +99,8 @@ def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", is
 	if (cypherSettings == "error"):
 		return cypherSettings
 	cypherList = []
-	if (sizeMulti == 0):
+	cypherList = cypherSettings["cypherList"]
+	'''if (sizeMulti == 0):
 		cypherList = cypherSettings["cypherList"]
 	else:
 		if (tg.createTempCypher(cypherSettings["cypherList"][0]) == "error"):
@@ -113,7 +114,7 @@ def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", is
 				importlib.reload(cypher)
 				if (cypher.returnInfo(3) <= sizeMulti):
 					cypherList.append(c)
-	print(cypherList)
+	print(cypherList)'''
 
 	if (text == "" and locText == ""):
 		print("Error no text.")
