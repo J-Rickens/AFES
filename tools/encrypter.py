@@ -185,9 +185,13 @@ def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", is
 			return "error"
 
 
+	importFlag = True
 	try:
 		if (tg.createTempCypher(cypherList[random.randint(0,len(cypherList)-1)]) == "error"):
 			raise TempCypherError
+		if (importFlag):
+			from cyphers import tempCypher as cypher
+			importFlag = False
 		importlib.reload(cypher)
 		recFlag = True # flag is inverted since it is used to keep while loop going
 		for rec in cypher.returnInfo(4):
