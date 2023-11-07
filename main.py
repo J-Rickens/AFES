@@ -1,4 +1,21 @@
-from tools import setManipulator as sm
+
+import importlib
+from tools import encrypter as e
+def ee(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", isPassword = False, isRSA = False, mainkey = "", genkey = 0):
+    importlib.reload(e)
+    return e.encrypt(layers, sizeMulti, text, locText, locSave, isPassword, isRSA, mainkey, genkey)
+
+def er(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", isPassword = False, publicKeyName = ""):
+    importlib.reload(e)
+    return e.encryptWithRSA(layers, sizeMulti, text, locText, locSave, isPassword, publicKeyName)
+    
+print(ee(layers = 0,sizeMulti = 1.5,locText = "C:\\Users\\Stickens\\Desktop\\text.txt"))#,publicKeyName = ""))
+
+
+
+
+
+"""from tools import setManipulator as sm
 from tools import tempGenerator as tg
 from tools import recTool as rt
 import random
@@ -97,3 +114,5 @@ import hashlib
 hashlib.algorithms_available
 hashSettings['saltEn'] = codecs.encode(os.urandom(hashSettings['sizeEn']),'hex').decode()
 hashSettings['saltSt'] = codecs.encode(os.urandom(hashSettings['sizeSt']),'hex').decode()
+
+"""
