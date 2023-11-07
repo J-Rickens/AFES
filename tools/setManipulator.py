@@ -77,7 +77,6 @@ def display(setType):
 	return 1
 
 def loadCyphers():
-	pyloc = os.getcwd()
 	settings = returnSet(1)
 	if (settings == "error"):
 		return "error"
@@ -94,7 +93,7 @@ def loadCyphers():
 	cypherFilesI = []
 	cypherFilesE = []
 	rsaFunctional = False
-	importflag = True
+	importFlag = True
 	for file in fileList:
 		if (file == "cypherTP.py" or file == "tempCypher.py" or file == "__init__.py"):
 			continue
@@ -114,7 +113,10 @@ def loadCyphers():
 					print("Created new key pair:", names[0][7:-4])
 					RSAKeys = rkg.importKeys(names[0][7:-4])
 				else:
-					RSAKeys = [RSAKeys[0][0],RSAKeys[1][0]]
+					for key in RSAKeys[0].keys():
+						if (key in RSAKeys[1].keys()):
+							RSAKeys = [RSAKeys[0][key],RSAKeys[1][key]]
+							break
 				publicKey = RSAKeys[0]
 				privateKey = RSAKeys[1]
 
@@ -150,9 +152,9 @@ def loadCyphers():
 					print("Error Functional Problem loading temp")
 					working = False
 				else:
-					if (importflag):
+					if (importFlag):
 						from cyphers import tempCypher as testCypher
-						importflag = False
+						importFlag = False
 					importlib.reload(testCypher)
 
 					flag = True

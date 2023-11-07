@@ -4,6 +4,7 @@ import os
 
 
 def saveKeys(name, publicKey, privateKey):
+	pyloc = os.getcwd()
 	settings = sm.returnSet(3)
 	if (settings == "error"):
 		return settings
@@ -88,22 +89,22 @@ def importKeys(name = "", needPub = True, needPri = True):
 				fileListPub = os.listdir(locPub)
 			except:
 				print("Error pulling directory: " + locPub)
-			publicKey = []
+			publicKey = {}
 			for fileName in fileListPub:
 				if (len(fileName) >= 12 and fileName[-4:] == ".pem" and fileName[:7] == "public_"):
 					try:
 						file_object = open((locPub+"\\"+fileName), 'rb')
-						publicKey.append(rsa.PublicKey.load_pkcs1(file_object.read()))
+						publicKey[fileName[7:-4]] = rsa.PublicKey.load_pkcs1(file_object.read())
 						file_object.close()
 					except:
 						print("Error opening key: " + fileName)
 		else:
 			try:
-				file_object = open((locPub+"\\public_"+fileNamePub+".pem"), 'rb')
+				file_object = open((locPub+"\\public_"+name+".pem"), 'rb')
 				publicKey = rsa.PublicKey.load_pkcs1(file_object.read())
 				file_object.close()
 			except:
-				print("Error opening key: " + (locPub+"\\public_"+fileNamePub+".pem"))
+				print("Error opening key: " + (locPub+"\\public_"+name+".pem"))
 
 	privateKey = ""
 	if (needPri):
@@ -117,24 +118,24 @@ def importKeys(name = "", needPub = True, needPri = True):
 				fileListPri = os.listdir(locPri)
 			except:
 				print("Error pulling directory: " + locPri)
-			privateKey = []
+			privateKey = {}
 			for fileName in fileListPri:
 				if (len(fileName) >= 13 and fileName[-4:] == ".pem" and fileName[:8] == "private_"):
 					try:
 						file_object = open((locPri+"\\"+fileName), 'rb')
-						privateKey.append(rsa.PrivateKey.load_pkcs1(file_object.read()))
+						privateKey[fileName[8:-4]] = rsa.PrivateKey.load_pkcs1(file_object.read())
 						file_object.close()
 					except:
 						print("Error opening key: " + fileName)
 		else:
 			try:
-				file_object = open((locPri+"\\private_"+fileNamePri+".pem"), 'rb')
+				file_object = open((locPri+"\\private_"+name+".pem"), 'rb')
 				privateKey = rsa.PrivateKey.load_pkcs1(file_object.read())
 				file_object.close()
 			except:
-				print("Error opening key: " + (locPri+"\\private_"+fileNamePri+".pem"))
+				print("Error opening key: " + (locPri+"\\private_"+name+".pem"))
 
-	if (len(publicKey) == 0 and len(privateKey) == 0):
+	if ((publicKey == "" or publicKey == {}) and (privateKey == "" or privateKey == {})):
 		print("Error no keys found.")
 		return "error"
 	return publicKey, privateKey
