@@ -9,7 +9,10 @@ import hashlib
 import json
 import codecs
 
-genkeySize = 16
+def getGenkeyLen():
+	genkeySize = 16
+	return genkeySize
+	
 
 def saveCtext(ctext, locSave = "", isRSA = False):
 	hashSettings = sm.returnSet(2)
@@ -71,13 +74,14 @@ def saveCtext(ctext, locSave = "", isRSA = False):
 		return "error"
 	return locSave, storHash
 
-def mainkeyGen(isPassword = False, RSAn = 1):
+def mainkeyGen(isPassword = False, genkey = 0, RSAn = 1):
 	hashSettings = sm.returnSet(2)
 	if (hashSettings == "error"):
 		return hashSettings
 
-	random.seed()
-	genkey = random.randint(10**(genkeySize-1),(10**genkeySize)-3)
+	if (genkey == 0):
+		random.seed()
+		genkey = random.randint(10**(getGenkeyLen()-1),(10**getGenkeyLen())-3)
 
 	phash = 1
 	if (isPassword):
@@ -91,7 +95,7 @@ def mainkeyGen(isPassword = False, RSAn = 1):
 		if (phash < 0):
 			phash *= -1
 
-	mainkey = (genkey + phash + RSAn)%(10**(genkeySize*4))
+	mainkey = (genkey + phash + RSAn)%(10**(getGenkeyLen()*4))
 	return mainkey, genkey
 
 def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", isPassword = False, isRSA = False, mainkey = "", genkey = 0):
@@ -135,6 +139,7 @@ def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", is
 	for rec in rt.returnRec().keys():
 		if (rt.checkIfRec(text, rec)):
 			currentOpo = rec
+	startOpo = currentOpo
 	
 	if (mainkey == ""):
 		temp = mainkeyGen(isPassword)
@@ -210,6 +215,17 @@ def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", is
 					break
 
 		genkey = str(genkey)
+		startOpo = str(startOpo)
+		storedDataLen = 0
+		for rec in rt.returnRec().keys():
+			if (storedDataLen < len(str(rec))):
+				storedDataLen = len(str(rec))
+		while (len(startOpo) < storedDataLen):
+			if ("." in startOpo):
+				startOpo += "0"
+			else:
+				startOpo += "."
+		genkey += startOpo
 		if (not rt.checkIfRec(genkey,0)):
 			print("Error numbers not in charList.")
 			raise CharListError
