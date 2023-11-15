@@ -278,7 +278,7 @@ def encryptWithRSA(layers = 3, sizeMulti = 0, text = "", locText = "", locSave =
 
 	mainkey = 0
 	genkey = 0
-	tempkeys = mainkeyGen(isPassword, publicKey.n)
+	tempkeys = mainkeyGen(isPassword, RSAn = publicKey.n)
 	if (tempkeys == "error"):
 		print("Error mainkeyGen")
 		return "error"
