@@ -1,6 +1,7 @@
 
 import importlib
 from tools import encrypter as e
+from tools import decrypter as d
 def ee(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", isPassword = False, isRSA = False, mainkey = "", genkey = 0):
     importlib.reload(e)
     return e.encrypt(layers, sizeMulti, text, locText, locSave, isPassword, isRSA, mainkey, genkey)
@@ -8,11 +9,36 @@ def ee(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", isPassw
 def er(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", isPassword = False, publicKeyName = ""):
     importlib.reload(e)
     return e.encryptWithRSA(layers, sizeMulti, text, locText, locSave, isPassword, publicKeyName)
-    
-print(ee(layers = 0,sizeMulti = 1.5,locText = "C:\\Users\\Stickens\\Desktop\\text.txt"))#,publicKeyName = ""))
 
+def de(ctext, layers = 3, sizeMulti = 0, locSave = "", isPassword = False, mainkey = "", currentOpo = 0):
+    importlib.reload(d)
+    importlib.reload(e)
+    return d.decrypt(ctext, layers, sizeMulti, locSave, isPassword, mainkey, currentOpo)
 
+def dr(ctext, privateKeyName, layers = 3, sizeMulti = 0, locSave = "", isPassword = False):
+    importlib.reload(d)
+    importlib.reload(e)
+    return d.decryptWithRSA(ctext, privateKeyName, layers, sizeMulti, locSave, isPassword)
 
+el = 5
+es = 100
+print("encrypting...")
+ctext, cloc, chash = ee(layers = el,sizeMulti = es,locText = "C:\\Users\\Stickens\\Desktop\\text.txt")
+print(ctext, cloc, chash, "Done\n", sep ="\n")
+
+print("decrypting...")
+ttext, tloc, thash = de(ctext,layers = el,sizeMulti = es)
+print(ttext, tloc, thash, "Done\n", sep ="\n")
+
+rl = 3
+rs = 100
+print("encrypting rsa...")
+ctext, cloc, chash, keyname = er(layers = rl,sizeMulti = rs,locText = "C:\\Users\\Stickens\\Desktop\\text.txt", publicKeyName = "")
+print(ctext, cloc, chash, keyname, "Done\n", sep ="\n")
+
+print("decrypting rsa...")
+ttext, tloc, thash = dr(ctext,keyname,layers = rl,sizeMulti = rs)
+print(ttext, tloc, thash, "Done\n", sep ="\n")
 
 
 """from tools import setManipulator as sm

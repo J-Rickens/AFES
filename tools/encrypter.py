@@ -12,7 +12,14 @@ import codecs
 def getGenkeyLen():
 	genkeySize = 16
 	return genkeySize
-	
+
+def getStoredLen():
+	storedLen = 0
+	for rec in rt.returnRec().keys():
+		if (storedLen < len(str(rec))):
+			storedLen = len(str(rec))
+	storedLen += getGenkeyLen()
+	return storedLen
 
 def saveCtext(ctext, locSave = "", isRSA = False):
 	hashSettings = sm.returnSet(2)
@@ -185,11 +192,13 @@ def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", is
 
 			ctext, currentOpo = cypher.encrypt(ctext, layerKey)
 			currentMulti *= cypher.returnInfo(3)
+			print(cypher.returnInfo(0))
 		except:
 			print("Error running Cypher. layer:",l)
 			return "error"
 
-
+	storedLen = getStoredLen()
+	random.seed(len(ctext)+storedLen)
 	importFlag = True
 	try:
 		if (tg.createTempCypher(cypherList[random.randint(0,len(cypherList)-1)]) == "error"):
@@ -214,24 +223,18 @@ def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", is
 					recFlag = False
 					break
 
-		genkey = str(genkey)
-		startOpo = str(startOpo)
-		storedDataLen = 0
-		for rec in rt.returnRec().keys():
-			if (storedDataLen < len(str(rec))):
-				storedDataLen = len(str(rec))
-		while (len(startOpo) < storedDataLen):
-			if ("." in startOpo):
-				startOpo += "0"
+		storedVal = str(genkey) + str(startOpo)
+		while (len(storedVal) < storedLen):
+			if ("." in storedVal):
+				storedVal += "0"
 			else:
-				startOpo += "."
-		genkey += startOpo
-		if (not rt.checkIfRec(genkey,0)):
-			print("Error numbers not in charList.")
+				storedVal += "."
+		if (not rt.checkIfRec(storedVal,0)):
+			print("Error charList missing values.")
 			raise CharListError
 
 		splitValue = random.randint(0,len(ctext)-1)
-		ctext = ctext[:splitValue] + cypher.encrypt(genkey,len(ctext)+len(genkey))[0] + ctext[splitValue:]
+		ctext = ctext[:splitValue] + cypher.encrypt(storedVal,(len(ctext)+storedLen))[0] + ctext[splitValue:]
 	except:
 		print("Error running Cypher. layer: genkey")
 		return "error"
@@ -272,6 +275,7 @@ def encryptWithRSA(layers = 3, sizeMulti = 0, text = "", locText = "", locSave =
 		for key in tempRSAKeys[1].keys():
 			if (key in tempRSAKeys[0]):
 				publicKey = tempRSAKeys[0][key]
+				publicKeyName = key
 				break
 	else:
 		publicKey = tempRSAKeys[0]
@@ -287,10 +291,12 @@ def encryptWithRSA(layers = 3, sizeMulti = 0, text = "", locText = "", locSave =
 		genkey = tempkeys[1]
 
 
-	ctext = encrypt(layers = layers, sizeMulti = sizeMulti, text = text, isRSA = True, mainkey = mainkey, genkey = genkey)
-	if (ctext == "error"):
-		print("Error in regular encrypt.")
-		return "error"
+	ctext = text
+	if(layers > 0):
+		ctext = encrypt(layers = layers, sizeMulti = sizeMulti, text = ctext, isRSA = True, mainkey = mainkey, genkey = genkey)
+		if (ctext == "error"):
+			print("Error in regular encrypt.")
+			return "error"
 
 	try:
 		from cyphers import rsaCypher
@@ -306,4 +312,4 @@ def encryptWithRSA(layers = 3, sizeMulti = 0, text = "", locText = "", locSave =
 		print("Error in saveCtext.")
 		return "error"
 	else:
-		return ctext, tempSaver[0], tempSaver[1]
+		return ctext, tempSaver[0], tempSaver[1], publicKeyName

@@ -10,6 +10,51 @@ import hashlib
 import json
 import codecs
 
+def getStoredVals(cypherList, ctext, isPassword, RSAn = 1):
+	mainkey = 0
+	currentOpo = 0
+	print("ctext:",ctext)
+
+	genkey = 0
+	random.seed(len(ctext))
+	importFlag = True
+	try:
+		if (tg.createTempCypher(cypherList[random.randint(0,len(cypherList)-1)]) == "error"):
+			raise TempCypherError
+		if (importFlag):
+			from cyphers import tempCypher as cypher
+			importFlag = False
+		importlib.reload(cypher)
+
+		while (cypher.returnInfo(3) > 1 or (0 not in cypher.returnInfo(4))):
+			if (tg.createTempCypher(cypherList[random.randint(0,len(cypherList)-1)]) == "error"):
+				raise TempCypherError
+			importlib.reload(cypher)
+
+		if (not rt.checkIfRec("1234567890.",0)):
+			print("Error numbers not in charList.")
+			raise CharListError
+
+		storedLen = e.getStoredLen()
+		splitValue = random.randint(0,len(ctext)-1-storedLen)
+		storedVal = cypher.decrypt(ctext[splitValue:splitValue+storedLen],len(ctext))[0]
+		
+		ctext = ctext[:splitValue] + ctext[splitValue+storedLen:]
+		genkey = int(storedVal[:e.getGenkeyLen()])
+		currentOpo = float(storedVal[e.getGenkeyLen():])
+	except:
+		print("Error running Cypher. layer: genkey")
+		return "error"
+
+	temp = e.mainkeyGen(isPassword, genkey, RSAn)
+	print(temp)
+	if (temp == "error"):
+		print("Error mainkeyGen")
+		return "error"
+	else:
+		mainkey = temp[0]
+	return ctext, mainkey, currentOpo
+
 def saveText(text, locSave = ""):
 	hashSettings = sm.returnSet(2)
 	if (hashSettings == "error"):
@@ -63,65 +108,24 @@ def saveText(text, locSave = ""):
 		return "error"
 	return locSave, storHash
 
-def decrypt(layers = 3, sizeMulti = 0, ctext, locSave = "", isPassword = False, mainkey = "", genkey = 0, currentOpo = 0):
+def decrypt(ctext, layers = 3, sizeMulti = 0, locSave = "", isPassword = False, mainkey = "", currentOpo = 0):
 	cypherSettings = sm.returnSet(1)
 	if (cypherSettings == "error"):
 		return cypherSettings
 	cypherList = cypherSettings["cypherList"]
 
 	if (mainkey == ""):
-		random.seed(len(ctext))
-		importFlag = True
-		try:
-			if (tg.createTempCypher(cypherList[random.randint(0,len(cypherList)-1)]) == "error"):
-				raise TempCypherError
-			if (importFlag):
-				from cyphers import tempCypher as cypher
-				importFlag = False
-			importlib.reload(cypher)
-			recFlag = True # flag is inverted since it is used to keep while loop going
-			for rec in cypher.returnInfo(4):
-				if (rt.checkIfRec(rt.returnRec(currentOpo), rec)):
-					recFlag = False
-					break
-	
-			while (cypher.returnInfo(3) > 1 or (0 not in cypher.returnInfo(4))):
-				if (tg.createTempCypher(cypherList[random.randint(0,len(cypherList)-1)]) == "error"):
-					raise TempCypherError
-				importlib.reload(cypher)
-				recFlag = True
-				for rec in cypher.returnInfo(4):
-					if (rt.checkIfRec(rt.returnRec(currentOpo), rec)):
-						recFlag = False
-						break
-	
-			if (not rt.checkIfRec("1234567890.",0)):
-				print("Error numbers not in charList.")
-				raise CharListError
-	
-			storedData = 0
-			for rec in rt.returnRec().keys():
-				if (storedData < len(str(rec))):
-					storedData = len(str(rec))
-			storedData += e.getGenkeyLen()
-			splitValue = random.randint(0,len(ctext)-1-storedData)
-			storedData = cypher.decrypt(genkey,len(ctext))[0]
-			
-			genkey = int(storedData[:e.getGenkeyLen()])
-			currentOpo = float(storedData[e.getGenkeyLen():])
-		except:
-			print("Error running Cypher. layer: genkey")
-			return "error"
-	
-		temp = e.mainkeyGen(isPassword, genkey)
+		temp = getStoredVals(cypherList, ctext, isPassword)
 		if (temp == "error"):
 			print("Error mainkeyGen")
 			return "error"
 		else:
-			mainkey = temp[0]
+			ctext = temp[0]
+			mainkey = temp[1]
+			currentOpo = temp[2]
 
-    pickedCyphers = []
-    importFlag = True
+	pickedCyphers = []
+	importFlag = True
 	currentMulti = 1
 	for l in range(1,layers+1):
 		layerKey = mainkey+(l**l)
@@ -143,30 +147,32 @@ def decrypt(layers = 3, sizeMulti = 0, ctext, locSave = "", isPassword = False, 
 					break
 
 			while (recFlag or (sizeMulti != 0 and ((currentMulti*cypher.returnInfo(3)) > sizeMulti)) ):
-                		cypherSelect = random.randint(0,len(cypherList)-1)
-        		        if (tg.createTempCypher(cypherList[cypherSelect]) == "error"):
-					print("Error creating tempCypher loop")
-					raise TempCypherError
-				importlib.reload(cypher)
-				recFlag = True
-				for rec in cypher.returnInfo(4):
-					if (rt.checkIfRec(rt.returnRec(currentOpo), rec)):
-						recFlag = False
-						break
+						cypherSelect = random.randint(0,len(cypherList)-1)
+						if (tg.createTempCypher(cypherList[cypherSelect]) == "error"):
+							print("Error creating tempCypher loop")
+							raise TempCypherError
+						importlib.reload(cypher)
+						recFlag = True
+						for rec in cypher.returnInfo(4):
+							if (rt.checkIfRec(rt.returnRec(currentOpo), rec)):
+								recFlag = False
+								break
  
-            for i, rec in enumerate(cypher.returnInfo(4)):
-                if (rt.checkIfRec(rt.returnRec(currentOpo), rec)):
-                    currentOpo = cypher.returnInfo(5)[i]
-                    break
-            currentMulti *= cypher.returnInfo(3)
-            pickedCyphers.append(cypherSelect)
+			for i, rec in enumerate(cypher.returnInfo(4)):
+				if (rt.checkIfRec(rt.returnRec(currentOpo), rec)):
+					currentOpo = cypher.returnInfo(5)[i]
+					break
+			currentMulti *= cypher.returnInfo(3)
+			pickedCyphers.append(cypherSelect)
 		except:
-			print("Error running Cypher. layer:",l)
+			print("Error finding Cypher. layer:",l)
 			return "error"
 	
 
+	for c in pickedCyphers:
+		print(cypherList[c])
 	text = ctext
-	for l in range(layers+1,1,-1):
+	for l in range(layers,0,-1):
 		layerKey = mainkey+(l**l)
 		random.seed(layerKey)
 
@@ -175,10 +181,10 @@ def decrypt(layers = 3, sizeMulti = 0, ctext, locSave = "", isPassword = False, 
 				print("Error creating tempCypher")
 				raise TempCypherError
 			importlib.reload(cypher)
-			
-				text, _ = cypher.decrypt(text, layerKey)
 
-	except:
+			text, _ = cypher.decrypt(text, layerKey)
+
+		except:
 			print("Error running Cypher. layer:",l)
 			return "error"
 
@@ -189,73 +195,46 @@ def decrypt(layers = 3, sizeMulti = 0, ctext, locSave = "", isPassword = False, 
 	else:
 		return text, tempSaver[0], tempSaver[1]
 
-def decryptWithRSA(layers = 3, sizeMulti = 0, ctext, locSave = "", isPassword = False, privateKeyName):
+def decryptWithRSA(ctext, privateKeyName, layers = 3, sizeMulti = 0, locSave = "", isPassword = False):
 	tempRSAKeys = rkg.importKeys(name = privateKeyName, needPub = False)
 	if (tempRSAKeys == "error"):
 		print("Error running importKeys")
 		return "error"
 	privateKey = tempRSAKeys[1]
 
-	text = ctext
+	text = ""
 	try:
+		for i in range(len(ctext)):
+			ctext[i] = codecs.decode(ctext[i], 'hex')
+
 		from cyphers import rsaCypher
 		importlib.reload(rsaCypher)
-		text = rsaCypher.decrypt(text, 0, privateKey)[0]
+		tempText = rsaCypher.decrypt(ctext, 0, privateKey)[0]
+		for t in tempText:
+			text += t
 	except:
 		print("Error running rsa cypher.")
 		return "error"
 
-	mainkey = 0
-	genkey = 0
-	currentOpo = 0
-	random.seed(len(ctext))
-	importFlag = True
-	try:
-		if (tg.createTempCypher(cypherList[random.randint(0,len(cypherList)-1)]) == "error"):
-			raise TempCypherError
-		if (importFlag):
-			from cyphers import tempCypher as cypher
-			importFlag = False
-		importlib.reload(cypher)
-		recFlag = True # flag is inverted since it is used to keep while loop going
-		for rec in cypher.returnInfo(4):
-			if (rt.checkIfRec(rt.returnRec(currentOpo), rec)):
-				recFlag = False
-				break
+	if (layers > 0):
+		cypherSettings = sm.returnSet(1)
+		if (cypherSettings == "error"):
+			return cypherSettings
+		cypherList = cypherSettings["cypherList"]
 
-		while (cypher.returnInfo(3) > 1 or (0 not in cypher.returnInfo(4))):
-			if (tg.createTempCypher(cypherList[random.randint(0,len(cypherList)-1)]) == "error"):
-				raise TempCypherError
-			importlib.reload(cypher)
-			recFlag = True
-			for rec in cypher.returnInfo(4):
-				if (rt.checkIfRec(rt.returnRec(currentOpo), rec)):
-					recFlag = False
-					break
+		temp = getStoredVals(cypherList, text, isPassword, privateKey.n)
+		if (temp == "error"):
+			print("Error mainkeyGen RSA")
+			return "error"
+		text = temp[0]
+		mainkey = temp[1]
+		currentOpo = temp[2]
 
-		if (not rt.checkIfRec("1234567890.",0)):
-			print("Error numbers not in charList.")
-			raise CharListError
-
-		storedData = 0
-		for rec in rt.returnRec().keys():
-			if (storedData < len(str(rec))):
-				storedData = len(str(rec))
-		storedData += e.getGenkeyLen()
-		splitValue = random.randint(0,len(ctext)-1-storedData)
-		storedData = cypher.decrypt(genkey,len(ctext))[0]
-		
-		genkey = int(storedData[:e.getGenkeyLen()])
-		currentOpo = float(storedData[e.getGenkeyLen():])
-	except:
-		print("Error running Cypher. layer: genkey")
-		return "error"
-
-	temp = e.mainkeyGen(isPassword, genkey, privatekey.n)
-	if (temp == "error"):
-		print("Error mainkeyGen")
-		return "error"
+		return decrypt(text, layers, sizeMulti, locSave, mainkey = mainkey, currentOpo = currentOpo)
 	else:
-		mainkey = temp[0]
-
-	return decrypt(layers, sizeMulti, ctext, locSave, isPassword = isPassword, mainkey = mainkey, genkey = genkey, currentOpo = currentOpo)
+		tempSaver = saveText(text, locSave)
+		if (tempSaver == "error"):
+			print("Error in saveText.")
+			return "error"
+		else:
+			return text, tempSaver[0], tempSaver[1]
