@@ -9,7 +9,17 @@ import hashlib
 import json
 import codecs
 
-genkeySize = 16
+def getGenkeyLen():
+	genkeySize = 16
+	return genkeySize
+
+def getStoredLen():
+	storedLen = 0
+	for rec in rt.returnRec().keys():
+		if (storedLen < len(str(rec))):
+			storedLen = len(str(rec))
+	storedLen += getGenkeyLen()
+	return storedLen
 
 def saveCtext(ctext, locSave = "", isRSA = False):
 	hashSettings = sm.returnSet(2)
@@ -71,13 +81,14 @@ def saveCtext(ctext, locSave = "", isRSA = False):
 		return "error"
 	return locSave, storHash
 
-def mainkeyGen(isPassword = False, RSAn = 1):
+def mainkeyGen(isPassword = False, genkey = 0, RSAn = 1):
 	hashSettings = sm.returnSet(2)
 	if (hashSettings == "error"):
 		return hashSettings
 
-	random.seed()
-	genkey = random.randint(10**(genkeySize-1),(10**genkeySize)-3)
+	if (genkey == 0):
+		random.seed()
+		genkey = random.randint(10**(getGenkeyLen()-1),(10**getGenkeyLen())-3)
 
 	phash = 1
 	if (isPassword):
@@ -91,7 +102,7 @@ def mainkeyGen(isPassword = False, RSAn = 1):
 		if (phash < 0):
 			phash *= -1
 
-	mainkey = (genkey + phash + RSAn)%(10**(genkeySize*4))
+	mainkey = (genkey + phash + RSAn)%(10**(getGenkeyLen()*4))
 	return mainkey, genkey
 
 def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", isPassword = False, isRSA = False, mainkey = "", genkey = 0):
@@ -135,6 +146,7 @@ def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", is
 	for rec in rt.returnRec().keys():
 		if (rt.checkIfRec(text, rec)):
 			currentOpo = rec
+	startOpo = currentOpo
 	
 	if (mainkey == ""):
 		temp = mainkeyGen(isPassword)
@@ -180,11 +192,13 @@ def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", is
 
 			ctext, currentOpo = cypher.encrypt(ctext, layerKey)
 			currentMulti *= cypher.returnInfo(3)
+			print(cypher.returnInfo(0))
 		except:
 			print("Error running Cypher. layer:",l)
 			return "error"
 
-
+	storedLen = getStoredLen()
+	random.seed(len(ctext)+storedLen)
 	importFlag = True
 	try:
 		if (tg.createTempCypher(cypherList[random.randint(0,len(cypherList)-1)]) == "error"):
@@ -209,13 +223,18 @@ def encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", is
 					recFlag = False
 					break
 
-		genkey = str(genkey)
-		if (not rt.checkIfRec(genkey,0)):
-			print("Error numbers not in charList.")
+		storedVal = str(genkey) + str(startOpo)
+		while (len(storedVal) < storedLen):
+			if ("." in storedVal):
+				storedVal += "0"
+			else:
+				storedVal += "."
+		if (not rt.checkIfRec(storedVal,0)):
+			print("Error charList missing values.")
 			raise CharListError
 
 		splitValue = random.randint(0,len(ctext)-1)
-		ctext = ctext[:splitValue] + cypher.encrypt(genkey,len(ctext)+len(genkey))[0] + ctext[splitValue:]
+		ctext = ctext[:splitValue] + cypher.encrypt(storedVal,(len(ctext)+storedLen))[0] + ctext[splitValue:]
 	except:
 		print("Error running Cypher. layer: genkey")
 		return "error"
@@ -256,13 +275,14 @@ def encryptWithRSA(layers = 3, sizeMulti = 0, text = "", locText = "", locSave =
 		for key in tempRSAKeys[1].keys():
 			if (key in tempRSAKeys[0]):
 				publicKey = tempRSAKeys[0][key]
+				publicKeyName = key
 				break
 	else:
 		publicKey = tempRSAKeys[0]
 
 	mainkey = 0
 	genkey = 0
-	tempkeys = mainkeyGen(isPassword, publicKey.n)
+	tempkeys = mainkeyGen(isPassword, RSAn = publicKey.n)
 	if (tempkeys == "error"):
 		print("Error mainkeyGen")
 		return "error"
@@ -271,10 +291,12 @@ def encryptWithRSA(layers = 3, sizeMulti = 0, text = "", locText = "", locSave =
 		genkey = tempkeys[1]
 
 
-	ctext = encrypt(layers = layers, sizeMulti = sizeMulti, text = text, isRSA = True, mainkey = mainkey, genkey = genkey)
-	if (ctext == "error"):
-		print("Error in regular encrypt.")
-		return "error"
+	ctext = text
+	if(layers > 0):
+		ctext = encrypt(layers = layers, sizeMulti = sizeMulti, text = ctext, isRSA = True, mainkey = mainkey, genkey = genkey)
+		if (ctext == "error"):
+			print("Error in regular encrypt.")
+			return "error"
 
 	try:
 		from cyphers import rsaCypher
@@ -290,4 +312,4 @@ def encryptWithRSA(layers = 3, sizeMulti = 0, text = "", locText = "", locSave =
 		print("Error in saveCtext.")
 		return "error"
 	else:
-		return ctext, tempSaver[0], tempSaver[1]
+		return ctext, tempSaver[0], tempSaver[1], publicKeyName
