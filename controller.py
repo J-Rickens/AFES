@@ -14,6 +14,27 @@ import codecs
 
 
 def encrypterMenu(choice):
+    choice = ui.menu('''\nEnter a number from the Settings menu
+                \n0: Back
+                \n1: Exit
+                \n2: Default Encrypt
+                \n3: Quick Encrypt
+                \n4: Long Encrypt
+                \n5: Encrypt with just RSA
+                \n6: Default Encrypt with RSA
+                \n7: Quick Encrypt with RSA
+                \n8: Long Encrypt with RSA
+                \n9: Custom Encrypt
+                \n10: Define Default, Quick, and Long settings
+                \n''')
+
+    choice = choice.split(".")
+        if (choice[0] == 0):
+            return 0
+        elif (choice[0] == 1):
+            return 1
+        elif (choice[0] == 2):
+            choice.pop(0)
     return 0
 
 def decrypterMenu(choice):
