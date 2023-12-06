@@ -21,3 +21,31 @@ def menu(menuText):
         if(uchoice not in numList):
             print("Please enter only the numbers provided")
     return int(uchoice)
+
+def getInt(prompt, min = 0, max = 999999999):
+    if (max < min):# check if max is less then min and switch if needed
+        temp = max
+        max = min
+        min = max
+    
+    uchoice = ""
+    flag = True
+    while (flag):# loops till between min and max values
+        uchoice = " "
+        while(uchoice.isdigit() == False):# loops till the entry is a digit
+            uchoice = input(prompt)# Ask user and display menu
+            if (uchoice.lower() == "exit"):# check if the user want to exit
+                return 1
+            elif (uchoice.lower() == "back"):# check if user want to go back
+                return 0
+            if (uchoice.isdigit() == False):# provides an error statment if not digit
+                print("Please enter just the number.")
+        uchoice = int(uchoice)# provides an error statment if not a valid number
+        if(uchoice >= min and uchoice <= max):
+            flag = False
+        else:
+            print("Please enter a number between", min, "and", max, ".")
+    return uchoice
+        
+
+
