@@ -12,35 +12,87 @@ import hashlib
 import json
 import codecs
 
-
-def encrypterMenu(choice):
-    choice = ui.menu('''\nEnter a number from the Settings menu
+def textMenu(textChoice):
+    while (True):
+        textChoice = ui.menu('''\nEnter a number from the text menu
                 \n0: Back
                 \n1: Exit
-                \n2: Default Encrypt
-                \n3: Quick Encrypt
-                \n4: Long Encrypt
-                \n5: Encrypt with just RSA
-                \n6: Default Encrypt with RSA
-                \n7: Quick Encrypt with RSA
-                \n8: Long Encrypt with RSA
-                \n9: Custom Encrypt
-                \n10: Define Default, Quick, and Long settings
+                \n2: Type Text
+                \n3: Chose file
                 \n''')
+    
+        if (textChoice == 0):
+            return 0, 0
+        elif (textChoice == 1):
+            return 1, 1
+        elif (textChoice == 2):
+            return 2, input("Enter Text:\n")
+        elif (textChoice == 3):
+            while (True):
+                loc = input("Enter location and file name (Ex: .\\example.txt or C:/Users/user/Desktop/example.txt):\n")
+                if (loc.lower() == "exit"):
+                    return 1, 1
+                elif (loc.lower() == "back"):
+                    break
+                elif (os.path.isfile(loc)):
+                    return 3, loc
+                else:
+                    print("Invalid location or file name")
+            
 
-    choice = choice.split(".")
-        if (choice[0] == 0):
+def encrypterMenu():
+    while (True):
+        choice = ui.menu('''\nEnter a number from the encrypter menu
+                    \n0: Back
+                    \n1: Exit
+                    \n2: Default Encrypt
+                    \n3: Quick Encrypt
+                    \n4: Long Encrypt
+                    \n5: Encrypt with just RSA
+                    \n6: Default Encrypt with RSA
+                    \n7: Quick Encrypt with RSA
+                    \n8: Long Encrypt with RSA
+                    \n9: Custom Encrypt
+                    \n10: Define Default, Quick, and Long settings
+                    \n''')
+    
+        if (choice == 0):
             return 0
-        elif (choice[0] == 1):
+        elif (choice == 1):
             return 1
-        elif (choice[0] == 2):
-            choice.pop(0)
+        
+        textChoice, text = textMenu()
+        if (textChoice == 1):
+            return 1
+        elif (textChoice == 0):
+            continue
+        elif (choice == 2):
+            if (textChoice == 2):
+                encrypt(text = text, isPassword = True)
+            elif (textChoice == 3):
+                encrypt(locText = text, isPassword = True)
+            else:
+                print("Error choice selection: textChoice",textChoice)
+        elif (choice == 3):
+            if (textChoice == 2):
+                encrypt(layers = 2, sizeMulti = 1, text = text)
+            elif (textChoice == 3):
+                encrypt(layers = 2, sizeMulti = 1, locText = text)
+            else:
+                print("Error choice selection: textChoice",textChoice)
+        elif (choice == 4):
+            if (textChoice == 2):
+                encrypt(layers = 2, sizeMulti = 1, text = text)
+            elif (textChoice == 3):
+                encrypt(layers = 2, sizeMulti = 1, locText = text)
+            else:
+                print("Error choice selection: textChoice",textChoice)
+
+encrypt(layers = 3, sizeMulti = 0, text = "", locText = "", locSave = "", isPassword = False, isRSA = False, mainkey = "", genkey = 0):
+def decrypterMenu():
     return 0
 
-def decrypterMenu(choice):
-    return 0
-
-def rsakeyMenu(choice):
+def rsakeyMenu():
     while (True):
         choice = ui.menu('''\nEnter a number from the Settings menu
                 \n0: Back
@@ -49,15 +101,13 @@ def rsakeyMenu(choice):
                 \n3: Make new Keys
                 \n''')
         
-        choice = choice.split(".")
-        if (choice[0] == 0):
+        if (choice == 0):
             return 0
-        elif (choice[0] == 1):
+        elif (choice == 1):
             return 1
-        elif (choice[0] == 2):
-            choice.pop(0)
+        elif (choice == 2):
             pubkeys, prikeys = importKeys()
-            menuStr = '''\nEnter a number from the Settings menu
+            menuStr = '''\nEnter a number from the menu
                 \n0: Back
                 \n1: Exit
                 \n'''
@@ -67,8 +117,7 @@ def rsakeyMenu(choice):
                 menuStr += "private_" + key + "\n"
             if (1 == ui.menu(menuStr)):
                 return 1
-        elif (choice[0] == 3):
-            choice.pop(0)
+        elif (choice == 3):
             name = input("Enter the key names: ")
             rkg.genKeys(name)
 
