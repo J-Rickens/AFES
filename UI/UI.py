@@ -59,13 +59,22 @@ def getNum(prompt, min = 0, max = 999999999, isInt = True):
             print("Please enter a number between", min, "and", max, ".")
     return uchoice
 
-def getLoc(isExist = True):
+def getLoc(isExist = True, isJustPath = False):
+    prompt = "Enter location and file name (Ex: .\\example.txt or C:\\Users\\user\\Desktop\\example.txt):\n"
+    if (isJustPath):
+        prompt = "Enter location (Ex: .\\ or C:\\Users\\user\\Desktop\\):\n"
     while (True):
-        loc = input("Enter location and file name (Ex: .\\example.txt or C:\\Users\\user\\Desktop\\example.txt):\n")
+        loc = input(prompt)
         if (loc.lower() == "exit"):
             return 1
         elif (loc.lower() == "back"):
             return 0
+
+        elif (isJustPath):
+            if (os.path.exists(loc)):# check if path exist
+                return loc
+            else:
+                print("Invalid location path (must use \\ and no filename)")
 
         elif (isExist):
             if (os.path.isfile(loc)):# check if file and path exist

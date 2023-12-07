@@ -549,17 +549,99 @@ def rsaMenu():
             name = input("Enter the key names: ")
             rkg.genKeys(name)
 
-def selectSetting():
+def setCategoryMenu(prompt = "", isAll = True):
     setList = sm.returnInfo(0)
-    menuList = '''\nEnter a number from the Settings menu
+    menuList = "\nEnter a number from the Settings Category " + prompt + '''menu
                 \n0: Back
                 \n1: Exit
-                \n2: All
                 \n'''
+    shift = 2
+    if (isAll):
+        menuList += "2: All\n"
+        shift += 1
     for i, set in enumerate(setList):
-        menuList += str(i+3) + ": " + set + "\n"
+        menuList += str(i+shift) + ": " + set + "\n"
     
     return ui.menu(menuList)
+
+def editSetMenu(setType, itemType):
+
+def setItemMenu(setType, isEdit = False):
+    settingItems = sm.returnSet(setType)
+    menuStr = '''\nEnter a number from the Settings Item menu
+            \n0: Back
+            \n1: Exit
+            \n'''
+    for i, key in enumerate(settingItems.keys()):
+        menuStr += str(i+2) + " " + key + " -> " + settingItems[key] + "\n"
+
+    itemChoice = ui.menu(menuStr)
+    if (setChoice == 1):
+        return 1
+    elif (setChoice == 0):
+        return 0
+    else:
+        if (isEdit):
+            return editSetMenu(setType, setChoice-2)
+        else:
+            typeNames = returnInfo(0)
+            temp = {typeNames[setType]: settingItems.keys()[setChoice-2]}
+            return temp
+
+def exportSetMenu():
+    exportData = {}
+    while (True):
+        flagCat = True
+        while (flagCat):
+            setChoice = setCategoryMenu("(export, enter 0 when all settings are selected) ")
+            if (setChoice == 1):
+                return 1
+            elif (setChoice == 0):
+                flagCat = False
+            elif (setChoice == 2):
+                continue
+            else:
+                flagItem = True
+                while (flagItem):
+                    itemChoice = setItemMenu(setChoice-3)
+                    if (itemChoice == 1):
+                        return 1
+                    elif (itemChoice == 0):
+                        flagItem = False
+                    else:
+                        for key, value in itemChoice.items():
+                            if (key in exportData):
+                                if (value in exportData[key]):
+                                    print("Already in list")
+                                else:
+                                    exportData[key].append(value)
+                            else:
+                                exportData[key] = [value]
+
+        exportChoice = ui.menu('''\nEnter a number from the export menu
+                \n0: Back (to settings menu)
+                \n1: Exit
+                \n2: continue to export
+                \n3: select more settings
+                \nSelected Settings: '''+str(exportData)+"\n")
+        if (exportChoice == 1):
+            return 1
+        elif (exportChoice == 0):
+            return 0
+        elif (exportChoice == 3):
+            continue
+        elif (exportChoice == 2):
+            loc = ui.getLoc(isJustPath = True)
+            if (loc == 1):
+                return 1
+            elif (loc == 0):
+                continue
+            else:
+                sm.exportSet(loc, exportData)
+                return 0
+        else:
+            print("Error unknown menu option:", exportChoice)
+            return 0
 
 def settingsMenu():
     while (True):
@@ -567,34 +649,63 @@ def settingsMenu():
                 \n0: Back
                 \n1: Exit
                 \n2: Display
-                \n3: Edit
-                \n4: Export
-                \n5: Import
+                \n3: Load Cyphers
+                \n4: Edit
+                \n5: Export
+                \n6: Import
                 \n''')
         
         if (choice == 0):
             return 0
         elif (choice == 1):
             return 1
-        
-        setChoice = selectSetting()
-        if (setChoice == 0):
-            continue
-        elif (setChoice == 1):
-            return 1
+
         elif (choice == 2):# display
-            if (setChoice == 2):
+            setChoice = setCategoryMenu("(display) ")
+            if (setChoice == 1):
+                return 1
+            elif (setChoice == 0):
+                continue
+            elif (setChoice == 2):
                 setList = sm.returnInfo(0)
                 for i in range(len(setList)):
                     sm.display(i)
             else:
                 sm.display(setChoice-3)
-        elif (choice == 3):# edit
-            continue
-        elif (choice == 4):# Export
-            continue
-        elif (choice == 5):# Import
-            continue
+
+        elif (choice == 3):# Load Cyphers
+            sm.loadCyphers()
+
+        elif (choice == 4):# edit
+            flagCat = True
+            while (flagCat):
+                setChoice = setCategoryMenu("(edit) ", False)
+                if (setChoice == 1):
+                    return 1
+                elif (setChoice == 0):
+                    flagCat = False
+                else:
+                    flagItem = True
+                    while (flagItem):
+                        itemChoice = setItemMenu(setChoice-2, True)
+                        if (itemChoice == 1):
+                            return 1
+                        elif (itemChoice == 0):
+                            flagItem = False
+        
+        elif (choice == 5):# Export
+            exportChoice = exportSetMenu()
+            if (exportChoice == 1):
+                return 1
+
+        elif (choice == 6):# Import
+            impFile = ui.getLoc()
+            if (impFile == 1):
+                return 1
+            elif (impFile == 0):
+                continue
+            else:
+                sm.importSet(impFile)
 
 def mainMenu():
     while (True):
