@@ -39,7 +39,7 @@ def getNum(prompt, min = 0, max = 999999999, isInt = True):
                 return "exit"
             elif (uchoice.lower() == "back"):# check if user want to go back
                 return "back"
-            if (isInt):# check if input is int or double based on isInt
+            if (isInt):# check if input is int or float based on isInt
                 try:
                     uchoice = int(uchoice)
                     flag2 = False
@@ -48,7 +48,7 @@ def getNum(prompt, min = 0, max = 999999999, isInt = True):
                     flag2 = True
             else:
                 try:
-                    uchoice = double(uchoice)
+                    uchoice = float(uchoice)
                     flag2 = False
                 except ValueError:
                     print("Please enter just the number (float).")
