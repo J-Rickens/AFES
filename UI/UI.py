@@ -22,30 +22,70 @@ def menu(menuText):
             print("Please enter only the numbers provided")
     return int(uchoice)
 
-def getInt(prompt, min = 0, max = 999999999):
+def getNum(prompt, min = 0, max = 999999999, isInt = True):
     if (max < min):# check if max is less then min and switch if needed
         temp = max
         max = min
         min = max
     
     uchoice = ""
-    flag = True
-    while (flag):# loops till between min and max values
-        uchoice = " "
-        while(uchoice.isdigit() == False):# loops till the entry is a digit
+    flag1 = True
+    while (flag1):# loops till between min and max values
+        flag2 = True
+        while(flag2):# loops till the entry is a digit and is int if isInt
             uchoice = input(prompt)# Ask user and display menu
             if (uchoice.lower() == "exit"):# check if the user want to exit
-                return 1
+                return "exit"
             elif (uchoice.lower() == "back"):# check if user want to go back
-                return 0
-            if (uchoice.isdigit() == False):# provides an error statment if not digit
-                print("Please enter just the number.")
-        uchoice = int(uchoice)# provides an error statment if not a valid number
-        if(uchoice >= min and uchoice <= max):
-            flag = False
-        else:
+                return "back"
+            if (isInt):# check if input is int or double based on isInt
+                try:
+                    uchoice = int(uchoice)
+                    flag2 = False
+                except ValueError:
+                    print("Please enter just the number (int).")
+                    flag2 = True
+            else:
+                try:
+                    uchoice = double(uchoice)
+                    flag2 = False
+                except ValueError:
+                    print("Please enter just the number (float).")
+                    flag2 = True
+
+        if(uchoice >= min and uchoice <= max):# check if num in range
+            flag1 = False
+        else:# provides an error statment if not in range
             print("Please enter a number between", min, "and", max, ".")
     return uchoice
-        
+
+def getLoc(isExist = True):
+    while (True):
+        loc = input("Enter location and file name (Ex: .\\example.txt or C:\\Users\\user\\Desktop\\example.txt):\n")
+        if (loc.lower() == "exit"):
+            return 1
+        elif (loc.lower() == "back"):
+            return 0
+
+        elif (isExist):
+            if (os.path.isfile(loc)):# check if file and path exist
+                return loc
+            else:
+                print("Invalid location or file name")
+
+        elif (not isExist):
+            if (os.path.isfile(loc)):# check if file and path exist
+                return loc
+            else:
+                loc = loc.split("\\")# split the file and path to check if file is valid name and path
+                path = "\\".join(loc[:-1])
+                if (not os.path.exists(path)):# check if path exist
+                    print("Invalid location path (must use \\)")
+                    continue
+                file = loc[-1].split(".")
+                if (len(file) == 2):
+                    return "\\".join(loc)
+                else:
+                    print("Invalid filename")
 
 
