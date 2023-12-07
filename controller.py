@@ -3,14 +3,8 @@ from tools import keyGenerator as rkg
 from tools import encrypter as e
 from tools import decrypter as d
 from ui import ui
-
-from tools import tempGenerator as tg
-from tools import recTool as rt
 import os
-import random
-import importlib
 import hashlib
-import json
 import codecs
 
 def textMenu():
@@ -565,6 +559,180 @@ def setCategoryMenu(prompt = "", isAll = True):
     return ui.menu(menuList)
 
 def editSetMenu(setType, itemType):
+    if (setType == 0):# setType General
+        settings = sm.returnSet(setType)
+        if (settings.keys()[itemType] == "locExport"):
+            loc = ui.getLoc(isJustPath = True)
+            if (loc == 1):
+                return 1
+            elif (loc == 0):
+                return 0
+            else:
+                settings["locExport"] = loc
+                sm.edit(setType, settings)
+                return 0
+
+        elif (settings.keys()[itemType] == "locSaveData"):
+            loc = ui.getLoc(isJustPath = True)
+            if (loc == 1):
+                return 1
+            elif (loc == 0):
+                return 0
+            else:
+                settings["locSaveData"] = loc
+                sm.edit(setType, settings)
+                return 0
+
+        elif (settings.keys()[itemType] == "locSaveCypherText"):
+            loc = ui.getLoc(isJustPath = True)
+            if (loc == 1):
+                return 1
+            elif (loc == 0):
+                return 0
+            else:
+                settings["locSaveCypherText"] = loc
+                sm.edit(setType, settings)
+                return 0
+        else:
+            print("Setting is not eligible for editting.")
+            return 0
+
+    elif (setType == 1):# setType Cypher
+        settings = sm.returnSet(setType)
+        if (settings.keys()[itemType] == "locCypherList"):
+            loc = ui.getLoc(isJustPath = True)
+            if (loc == 1):
+                return 1
+            elif (loc == 0):
+                return 0
+            else:
+                settings["locCypherList"] = loc
+                sm.edit(setType, settings)
+                return 0
+        else:
+            print("Setting is not eligible for editting.")
+            return 0
+
+    elif (setType == 2):# setType Hash
+        settings = sm.returnSet(setType)
+        if (settings.keys()[itemType] == "typeEn"):
+            menuStr = '''\nEnter a number from the Hash Type menu
+                    \n0: Back
+                    \n1: Exit
+                    \n'''
+            typeList = []
+            for i, type in enumerate(hashlib.algorithms_available):
+                menuStr += str(i+2) + ": " + type + "\n"
+                typeList.append(type)
+            choice = ui.menu(menuStr)
+            if (choice == 1):
+                return 1
+            elif (choice == 0):
+                return 0
+            else:
+                settings["typeEn"] = typeList[choice-2]
+                sm.edit(setType, settings)
+                return 0
+
+        elif (settings.keys()[itemType] == "sizeEn"):
+            size = ui.getNum('''Password salt size (Enter "back" or "exit" to go back or exit):
+                            \n''', min = 16, max = 128)
+            if (size == "exit"):
+                return 1
+            elif (size == "back"):
+                return 0
+            else:
+                settings["sizeEn"] = size
+                sm.edit(setType, settings)
+                return 0
+
+        elif (settings.keys()[itemType] == "saltEn"):
+            settings['saltEn'] = codecs.encode(os.urandom(settings['sizeEn']),'hex').decode()
+            sm.edit(setType, settings)
+            return 0
+
+        elif (settings.keys()[itemType] == "typeSt"):
+            menuStr = '''\nEnter a number from the Hash Type menu
+                    \n0: Back
+                    \n1: Exit
+                    \n'''
+            typeList = []
+            for i, type in enumerate(hashlib.algorithms_available):
+                menuStr += str(i+2) + ": " + type + "\n"
+                typeList.append(type)
+            choice = ui.menu(menuStr)
+            if (choice == 1):
+                return 1
+            elif (choice == 0):
+                return 0
+            else:
+                settings["typeSt"] = typeList[choice-2]
+                sm.edit(setType, settings)
+                return 0
+
+        elif (settings.keys()[itemType] == "sizeSt"):
+            size = ui.getNum('''Storage salt size (Enter "back" or "exit" to go back or exit):
+                            \n''', min = 8, max = 128)
+            if (size == "exit"):
+                return 1
+            elif (size == "back"):
+                return 0
+            else:
+                settings["sizeSt"] = size
+                sm.edit(setType, settings)
+                return 0
+
+        elif (settings.keys()[itemType] == "saltSt"):
+            settings['saltSt'] = codecs.encode(os.urandom(settings['sizeSt']),'hex').decode()
+            sm.edit(setType, settings)
+            return 0
+        else:
+            print("Setting is not eligible for editting.")
+            return 0
+
+    elif (setType == 3):# setType RSA
+        settings = sm.returnSet(setType)
+        if (settings.keys()[itemType] == "size"):
+            size = ui.getNum('''RSA Key Size in bytes (Enter "back" or "exit" to go back or exit):
+                            \n''', min = 512, max = 4096)
+            if (size == "exit"):
+                return 1
+            elif (size == "back"):
+                return 0
+            else:
+                settings["size"] = size
+                sm.edit(setType, settings)
+                return 0
+
+        elif (settings.keys()[itemType] == "locPublic"):
+            loc = ui.getLoc(isJustPath = True)
+            if (loc == 1):
+                return 1
+            elif (loc == 0):
+                return 0
+            else:
+                settings["locPublic"] = loc
+                sm.edit(setType, settings)
+                return 0
+
+        elif (settings.keys()[itemType] == "locPrivate"):
+            loc = ui.getLoc(isJustPath = True)
+            if (loc == 1):
+                return 1
+            elif (loc == 0):
+                return 0
+            else:
+                settings["locPrivate"] = loc
+                sm.edit(setType, settings)
+                return 0
+        else:
+            print("Setting is not eligible for editting.")
+            return 0
+
+    else:
+        print("Error setting type not defined:", setType)
+        return 0
+
 
 def setItemMenu(setType, isEdit = False):
     settingItems = sm.returnSet(setType)

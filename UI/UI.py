@@ -1,4 +1,5 @@
-
+import os
+import os.path
 
 # give menu options following proper format
 # it will prompt user for their choice and ensure it is a listed choice
@@ -27,7 +28,7 @@ def getNum(prompt, min = 0, max = 999999999, isInt = True):
         temp = max
         max = min
         min = max
-    
+
     uchoice = ""
     flag1 = True
     while (flag1):# loops till between min and max values
