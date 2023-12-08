@@ -6,6 +6,7 @@ from UI import UI as ui
 import os
 import hashlib
 import codecs
+import json
 
 def textMenu():
 	while (True):
@@ -285,6 +286,8 @@ def ctextMenu():
 		loc = pyloc + genSettings["locSaveCypherText"][1:]
 	else:
 		loc = genSettings["locSaveCypherText"]
+	if (loc[-1] != '\\'):
+		loc += '\\'
 
 	menuStrFile = '''\nEnter a number from the file list menu
 			\n0: Back
@@ -445,7 +448,7 @@ def decrypterMenu():
 						customizerMenuNum = 3
 
 				elif (customizerMenuNum == 3):
-					layers = us.getNum('''How many Layers 
+					layers = ui.getNum('''How many Layers 
 							\n(Enter "back" or "exit" to go back or exit) customizer menu 3/5:
 							\n''', min = layerMin, max = 10)
 					if (layers == "exit"):
@@ -456,7 +459,7 @@ def decrypterMenu():
 						customizerMenuNum = 4
 
 				elif (customizerMenuNum == 4):
-					sizeMulti = us.getNum('''How many times bigger can the text be (Enter 0 for no limit)
+					sizeMulti = ui.getNum('''How many times bigger can the text be (Enter 0 for no limit)
 							\n(Enter "back" or "exit" to go back or exit) customizer menu 4/5:
 							\n''', min = 0, isInt = False)
 					if (sizeMulti == "exit"):
