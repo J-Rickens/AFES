@@ -20,10 +20,11 @@ def dr(ctext, privateKeyName, layers = 3, sizeMulti = 0, locSave = "", isPasswor
     importlib.reload(e)
     return d.decryptWithRSA(ctext, privateKeyName, layers, sizeMulti, locSave, isPassword)
 
+loc = "C:\\Users\\Stickens\\Desktop\\GIT\\projects\\AFES other\\text.txt"
 el = 5
 es = 100
 print("encrypting...")
-ctext, cloc, chash = ee(layers = el,sizeMulti = es,locText = "C:\\Users\\Stickens\\Desktop\\text.txt")
+ctext, cloc, chash = ee(layers = el,sizeMulti = es,locText = loc)
 print(ctext, cloc, chash, "Done\n", sep ="\n")
 
 print("decrypting...")
@@ -33,7 +34,7 @@ print(ttext, tloc, thash, "Done\n", sep ="\n")
 rl = 3
 rs = 100
 print("encrypting rsa...")
-ctext, cloc, chash, keyname = er(layers = rl,sizeMulti = rs,locText = "C:\\Users\\Stickens\\Desktop\\text.txt", publicKeyName = "")
+ctext, cloc, chash, keyname = er(layers = rl,sizeMulti = rs,locText = loc, publicKeyName = "")
 print(ctext, cloc, chash, keyname, "Done\n", sep ="\n")
 
 print("decrypting rsa...")
